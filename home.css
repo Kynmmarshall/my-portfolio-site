@@ -18,7 +18,7 @@
     width: 1000px;
     height: 200px;
     margin: auto;
-    background:linear-gradient(135deg,  rgb(0, 0, 0)0%,rgb(217, 220, 220) 100%);
+    background:linear-gradient(135deg, rgb(217, 220, 220)0%,rgb(0, 0, 0)50%,rgb(217, 220, 220) 100%);
 }
 
 .title{
@@ -67,10 +67,6 @@ button:hover {
   margin: auto;
 }
 
-#Aboutus{
-  width: 1000px;
-  margin: auto;
-}
 
 .domain{
     color: #8a8787;
@@ -90,7 +86,12 @@ h4{
 
 P{
     font-size: 22px;
-    font-family: Impact;
+    font-family:'Times New Roman';
+}
+
+h6{
+    font-size: 22px;
+    font-family:'Trebuchet MS';
 }
 
 .topInfo{
@@ -123,10 +124,37 @@ P{
     margin-top: 50px;
 }
 
+.message{
+    display: flex;
+    padding: 20px;
+    font-size: 25px;
+    font-weight: 80 px;
+    font-family: Arial;
+    border: solid;
+    border-color: black;
+    border-width: 7px;
+    border-top:none;
+    border-right: none;
+    background-color: rgb(217, 220, 220);
+    width: 400px;
+    height: 150px;
+    margin: auto;
+    margin-top: 50px;
+}
+
 .skilltext{
-    font-family: 'Segoe UI';
+    font-family:'Times New Roman';
+    font-weight: 2px;
     margin: auto;
     margin-left: 10px;
+}
+
+#Aboutme {
+    display: block;
+    padding: 60px 20px;
+    width: 1000px;
+    margin: auto;
+    text-align: center;
 }
 
 footer{
