@@ -36,6 +36,22 @@
     margin-top: 50px;
 }
 
+.bottomicon{
+    height: 30px;
+    width: 30px;
+    background-color: rgb(0, 0, 0);
+    padding: 5px;
+    margin: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    transition: .5s;
+}
+
+.bottomicon:hover{
+    transform: translateY(-10px);
+    box-shadow: none;
+}
+
+
 button{
     border: none;
     border-radius: 50px;
@@ -86,7 +102,7 @@ h4{
     font-size: 25px;
 }
 
-P{
+p{
     font-size: 22px;
     font-family:'Times New Roman';
 }
