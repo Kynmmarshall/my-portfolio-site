@@ -16,7 +16,7 @@
 
 .bottomHome{
     width: 1000px;
-    height: 200px;
+    height: 20px;
     margin: auto;
     background:linear-gradient(135deg, rgb(217, 220, 220)0%,rgb(0, 0, 0)50%,rgb(217, 220, 220) 100%);
 }
@@ -127,7 +127,7 @@ h6{
 .message{
     display: flex;
     padding: 20px;
-    font-size: 25px;
+    font-size: 14px;
     font-weight: 80 px;
     font-family: Arial;
     border: solid;
