@@ -104,6 +104,25 @@ P{
     
 }
 
+.TextArea{
+    display: flex;
+    padding: 20px;
+    font-size: 25px;
+    font-weight: 80 px;
+    font-family: Arial;
+    border: solid;
+    border-color: black;
+    border-width: 7px;
+    border-top:none;
+    border-right: none;
+    background-color: rgb(217, 220, 220);
+    width: 400px;
+    height: 25px;
+    justify-content: end;
+    margin: auto;
+    margin-top: 50px;
+}
+
 .skilltext{
     font-family: 'Segoe UI';
     margin: auto;
@@ -111,8 +130,14 @@ P{
 }
 
 footer{
+    display: flex;
     width: 1000px;
+    height: 200px;
+    background-color: #000000;
     margin: auto;
+    color: #ffffff;
+    margin-top: 30px;
+    justify-content: center;
 }
 
 .logo{
