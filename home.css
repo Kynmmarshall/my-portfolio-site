@@ -62,6 +62,20 @@ button{
     transition: .3s;
 }
 
+.projects{
+    width: 10 px;
+    height: 200 px;
+    margin-right:150px;
+    margin-left: 150px;
+}
+
+.sendbutton{
+    padding: 10px;
+    margin-top: 20px;
+    background-color: rgb(58, 74, 74);
+    justify-content: center;
+}
+
 .container{
     width: "1000px";
     margin: auto;
