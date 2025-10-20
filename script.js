@@ -1,7 +1,7 @@
 /**
- * Portfolio Website JavaScript Enhancements
- * Enhanced with detailed comments and error fixes
- * Author: Kamdeu Yamdjeuson Neil Marshall
+  Portfolio Website JavaScript Enhancements
+  Enhanced with detailed comments and error fixes
+  Author: Kamdeu Yamdjeuson Neil Marshall
  */
 
 // Wait for the DOM to be fully loaded before executing scripts
