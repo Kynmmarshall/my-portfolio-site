@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all features
     initSmoothScrolling();
     initNavbarEffects();
-    initContactForm();
+    //initContactForm();
     initScrollAnimations();
     initSkillHoverEffects();
     updateCopyrightYear();
