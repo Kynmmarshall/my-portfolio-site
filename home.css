@@ -77,7 +77,7 @@ button{
 }
 
 .container{
-    width: "1000px";
+    width: 1000px;
     margin: auto;
 }
 button:hover {
@@ -231,4 +231,48 @@ footer{
     width: 150px;
     height: 150px;
     padding-left: 80px;
+}
+
+
+/* Mobile menu styles */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1001;
+    background: black;
+    color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+    
+    .topButtons {
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .topButtons.mobile-active {
+        transform: translateX(0);
+    }
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Ensure form button transitions */
+.sendbutton {
+    transition: all 0.3s ease !important;
 }
