@@ -8,6 +8,12 @@ export type Project = {
   stack: string[];
   liveUrl: string;
   sourceUrl?: string;
+  playStore?: {
+    url: string;
+    developer: string;
+    developerUrl: string;
+    packageId: string;
+  };
   color: string;
   logo: string;
   cover: string;
@@ -73,6 +79,13 @@ export const projects: Project[] = [
     stack: ["Flutter", "Flame", "Dart", "Tiled"],
     liveUrl: "https://fruitcollector.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/MobileGame",
+    playStore: {
+      url: "https://play.google.com/store/apps/details?id=com.kynmmarshall.fruitcollector&hl=fr",
+      developer: "Kamdeu Yamdjeuson Neil Marshall",
+      developerUrl:
+        "https://play.google.com/store/apps/developer?id=Kamdeu+Yamdjeuson+Neil+Marshall",
+      packageId: "com.kynmmarshall.fruitcollector",
+    },
     color: "lilac",
     logo: "/media/projects/fruit-collector/logo.webp",
     cover: "/media/projects/fruit-collector/cover.webp",
@@ -88,12 +101,17 @@ export const projects: Project[] = [
     approach:
       "Built with Flutter and the Flame engine, the game combines character animation and collision-driven gameplay with touch and keyboard controls. SharedPreferences persists progress. Game-art credits remain with their respective creators.",
     highlights: [
+      "Published on Google Play for Android",
       "Five levels and four selectable characters",
       "Touch and keyboard input",
       "Collision, gravity, and movement systems",
       "Locally saved progression",
     ],
     evidence: [
+      {
+        label: "Google Play release",
+        url: "https://play.google.com/store/apps/details?id=com.kynmmarshall.fruitcollector&hl=fr",
+      },
       {
         label: "Game and technical details",
         url: "https://fruitcollector.duckdns.org",
@@ -156,8 +174,15 @@ export const projects: Project[] = [
     liveUrl: "https://trip-io.duckdns.org",
     color: "blue",
     logo: "/media/projects/trip-io/logo.webp",
-    cover: "/media/projects/trip-io/cover.webp",
-    gallery: ["/media/projects/trip-io/cover.webp"],
+    cover: "/media/projects/trip-io/destinations.webp",
+    gallery: [
+      "/media/projects/trip-io/destinations.webp",
+      "/media/projects/trip-io/itinerary.webp",
+      "/media/projects/trip-io/map.webp",
+      "/media/projects/trip-io/tia-assistant.webp",
+      "/media/projects/trip-io/chat.webp",
+      "/media/projects/trip-io/about.webp",
+    ],
     featured: true,
     problem:
       "Discovering a city is one thing; fitting its destinations into a useful day plan is another. Trip-io focuses on real places in Cameroon's capital.",

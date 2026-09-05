@@ -12,6 +12,7 @@ test("recognizable social logos link to verified profiles in hero and footer", a
       href: "https://www.linkedin.com/in/kamdeu-yamdjeuson-neil-marshall-a70566298",
     },
     { name: "itch.io", href: "https://kynmarshall.itch.io" },
+    { name: "WhatsApp", href: "https://wa.me/237676093910" },
   ];
   for (const label of ["Connect with Marshall", "Social profiles"]) {
     const navigation = page.getByRole("navigation", {
@@ -39,6 +40,11 @@ test("recognizable social logos link to verified profiles in hero and footer", a
       navigation.getByRole("link", { name: "Email", exact: true }),
     ).toHaveAttribute("href", "mailto:kynmmarshall@gmail.com");
   }
+  await expect(
+    page
+      .locator("#contact")
+      .getByRole("link", { name: "WhatsApp: +237 676 093 910" }),
+  ).toHaveAttribute("href", "https://wa.me/237676093910");
   await page.setViewportSize({ width: 320, height: 568 });
   const heroLinks = page.getByRole("navigation", {
     name: "Connect with Marshall",

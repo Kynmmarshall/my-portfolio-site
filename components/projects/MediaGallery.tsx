@@ -6,9 +6,11 @@ import { ArrowLeft, ArrowRight, Maximize2, X } from "lucide-react";
 export function MediaGallery({
   images,
   title,
+  landscape = false,
 }: {
   images: string[];
   title: string;
+  landscape?: boolean;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -20,7 +22,7 @@ export function MediaGallery({
   }
   return (
     <>
-      <div className="gallery">
+      <div className={`gallery${landscape ? " landscape-gallery" : ""}`}>
         {images.map((image, index) => (
           <button
             key={image}

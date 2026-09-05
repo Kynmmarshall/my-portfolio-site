@@ -42,27 +42,10 @@ test("portrait depth and background motion render across desktop and mobile", as
   const firstFrame = await canvasPixels(canvas);
   await page.mouse.move(1100, 310);
   await expect
-    .poll(() =>
-      page
-        .locator("#main")
-        .evaluate((element) =>
-          parseFloat(element.style.getPropertyValue("--ambient-x")),
-        ),
-    )
-    .toBeGreaterThan(1);
-  await expect
     .poll(async () => Buffer.compare(firstFrame, await canvasPixels(canvas)))
     .not.toBe(0);
   await page.evaluate(() => window.scrollTo(0, 160));
-  await expect
-    .poll(() =>
-      page
-        .locator("#main")
-        .evaluate((element) =>
-          parseFloat(element.style.getPropertyValue("--ambient-scroll")),
-        ),
-    )
-    .toBeGreaterThan(1);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page
     .getByRole("button", { name: "Pause animation", exact: true })
@@ -119,7 +102,8 @@ test("project logos animate and respect the global pause control", async ({
 }) => {
   await page.goto("/projects");
   const artwork = page.locator(".project-logo-art").first();
-  await artwork.scrollIntoViewIfNeeded();
+  const container = page.locator(".project-logo").first();
+  await container.scrollIntoViewIfNeeded();
   const firstTransform = await artwork.evaluate(
     (element) => getComputedStyle(element).transform,
   );
@@ -131,16 +115,23 @@ test("project logos animate and respect the global pause control", async ({
   await page
     .getByRole("button", { name: "Pause background effects", exact: true })
     .click();
-  await artwork.scrollIntoViewIfNeeded();
+  await container.scrollIntoViewIfNeeded();
   await expect
     .poll(() =>
       artwork.evaluate((element) => getComputedStyle(element).transform),
     )
     .toBe("none");
   await page.mouse.move(300, 500);
-  const background = await page.locator("#main").getAttribute("style");
+  const background = await canvasPixels(
+    page.locator(".terrain-background canvas"),
+  );
   await page.mouse.move(1000, 400);
-  expect(await page.locator("#main").getAttribute("style")).toBe(background);
+  expect(
+    Buffer.compare(
+      background,
+      await canvasPixels(page.locator(".terrain-background canvas")),
+    ),
+  ).toBe(0);
 });
 
 test("project collection, exact live URLs, filters and media work", async ({

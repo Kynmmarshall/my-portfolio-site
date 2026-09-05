@@ -1,0 +1,74 @@
+[
+  {
+    "label": "Destination discovery and filters",
+    "source": "public/media/projects/trip-io/destinations.png",
+    "output": "public/media/projects/trip-io/destinations.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1833,
+    "originalHeight": 840,
+    "width": 1600,
+    "height": 733,
+    "bytes": 239934,
+    "sha256": "f2e9691b3708c033910f323a00f9dd01e859c1ec0e6f9f86214d897bd38a0b30"
+  },
+  {
+    "label": "Itinerary planning",
+    "source": "public/media/projects/trip-io/iternary.png",
+    "output": "public/media/projects/trip-io/itinerary.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1841,
+    "originalHeight": 849,
+    "width": 1600,
+    "height": 738,
+    "bytes": 103448,
+    "sha256": "239ed01b7122d3653794079420ae97010677b41ce32eec39ffa9c3bd4391e800"
+  },
+  {
+    "label": "Destination map",
+    "source": "public/media/projects/trip-io/map.png",
+    "output": "public/media/projects/trip-io/map.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1849,
+    "originalHeight": 855,
+    "width": 1600,
+    "height": 740,
+    "bytes": 165828,
+    "sha256": "335c3b12426598cab43003d7c08f176401292370ad59776f6c4f3e5a601e4947"
+  },
+  {
+    "label": "TIA assistant",
+    "source": "public/media/projects/trip-io/TIA assist.png",
+    "output": "public/media/projects/trip-io/tia-assistant.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1835,
+    "originalHeight": 840,
+    "width": 1600,
+    "height": 732,
+    "bytes": 146312,
+    "sha256": "1bf9b0e87dcedbca777a0a53568e1015470cb6414c617ad1911582e0a7389055"
+  },
+  {
+    "label": "Community chat",
+    "source": "public/media/projects/trip-io/chat.png",
+    "output": "public/media/projects/trip-io/chat.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1420,
+    "originalHeight": 849,
+    "width": 1420,
+    "height": 849,
+    "bytes": 77644,
+    "sha256": "880e62a62a258dcc98f9de8cd938fbbef314fa01a6995c46484d52ea19dc937c"
+  },
+  {
+    "label": "About Trip-io",
+    "source": "public/media/projects/trip-io/about.png",
+    "output": "public/media/projects/trip-io/about.webp",
+    "provenance": "User-supplied application screenshot",
+    "originalWidth": 1804,
+    "originalHeight": 868,
+    "width": 1600,
+    "height": 770,
+    "bytes": 107030,
+    "sha256": "f1acb2f11d741e2394c926bda0f232531979d576114a206a4ef5b1fc6cbe8759"
+  }
+]

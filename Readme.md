@@ -2,6 +2,14 @@
 
 Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a layered portrait hero, mouse/scroll-reactive backgrounds, animated project logos, case studies, locally optimized media, GitHub insights, and recognizable social-profile links.
 
+Expertise has a separate `/expertise` page, with individually labeled technology logos and practice icons. Its reviewed stack includes every technology explicitly named in the GitHub profile snapshot, plus current portfolio tools; entries without corroborating project evidence are marked Profile-listed. The homepage links to this page instead of duplicating its full content.
+
+The top navigation includes Profile, linking to `/resume`. This is a styled engineering document with a portrait, social links, compact technology logos, project logos, role attribution, and a verified Google Play publication. Print / Save PDF uses a dedicated A4 stylesheet; print output hides site navigation and animated backgrounds.
+
+Fruit Collector links to its verified Google Play listing (`com.kynmmarshall.fruitcollector`) from project cards and its detail page. The public Google Play developer account is included in social links and the profile. No download counts, ratings, or additional store accounts are inferred.
+
+The continuous wireframe terrain is rendered strictly behind content. GPU vertex displacement, a single mesh, capped pixel ratio, 24/30 FPS render targets, debounced resizing, and pause/visibility handling bound its cost. Shader-based depth softening approximates defocus without a fullscreen postprocessing pass. Optional device tilt requires an explicit action on supported secure mobile browsers. This is optimized for low overhead, not a guarantee of zero lag on every device.
+
 ## Run Locally
 
 Requires Node.js 24.x and npm. The original static site files remain untouched.
@@ -47,7 +55,9 @@ Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_
 
 `npm run assets:logos` imports the seven project branding assets listed in `content/logos.ts`. Listings show these logos only; screenshots and gameplay are kept on project detail pages. The header pause control stops logo, portrait, and ambient background motion across the site. OS reduced-motion preferences are respected.
 
-The hero no longer displays an Artistic/Wireframe toggle. GitHub, LinkedIn, itch.io, and email links have labeled logos/icons in both the hero and footer.
+`npm run assets:tools` imports the official Flame/Pygame marks; other technology logos are local Devicon SVG imports. Tiled and unbranded engineering practices use named Lucide symbols. `npm run assets:trip` regenerates optimized copies of the six user-supplied Trip-io PNG screenshots, without changing the originals. Trip-io now uses the destination UI as its cover, not the older website capture.
+
+The hero no longer displays an Artistic/Wireframe toggle. GitHub, LinkedIn, itch.io, Google Play, WhatsApp, and email links have labeled logos/icons in the hero, footer, and profile. WhatsApp opens `https://wa.me/237676093910`; the contact section displays +237 676 093 910. No message is sent automatically.
 
 ## Main Boundaries
 

@@ -18,6 +18,15 @@ export default function PrivacyPage() {
         Project reachability checks run on the server against a fixed list of
         public project addresses. Neither panel tracks your browsing activity.
       </p>
+      <h2>Optional device tilt</h2>
+      <p>
+        On supported secure mobile browsers, you can enable device tilt to move
+        the background camera. A permission request is made only after you
+        choose that control when the browser requires one. Orientation values
+        are used locally, are not stored or transmitted, and are ignored while
+        effects are paused, reduced motion is enabled, or the page is hidden.
+        Camera, microphone, and location access are not used.
+      </p>
       <h2>Contact and external websites</h2>
       <p>
         Email links open your own email application. Any message you choose to

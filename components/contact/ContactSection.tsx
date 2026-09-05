@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
 import { profile } from "@/content/profile";
+import whatsappLogo from "@/images/whatsapp.png";
 
 export function ContactSection() {
   const [intent, setIntent] = useState("A project");
@@ -76,6 +78,15 @@ export function ContactSection() {
                 ? "Copy unavailable. Use the email link."
                 : ""}
           </span>
+          <a
+            href={profile.whatsapp}
+            className="text-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image src={whatsappLogo} alt="" width={20} height={20} className="whatsapp-logo" />
+            WhatsApp: {profile.phoneDisplay} <ArrowUpRight size={15} />
+          </a>
           <Link href="/resume" className="text-link">
             View engineering profile <ArrowUpRight size={15} />
           </Link>

@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ArrowUpRight, Menu, X, Pause, Play } from "lucide-react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
+import { DeviceTiltControl } from "@/components/motion/DeviceTiltControl";
 
 const links = [
   { href: "/projects", label: "Work" },
   { href: "/expertise", label: "Expertise" },
+  { href: "/resume", label: "Profile" },
   { href: "/insights", label: "Insights" },
 ];
 
@@ -46,6 +48,7 @@ export function SiteHeader() {
         <Link href="/#contact" className="header-contact">
           Let&apos;s talk <ArrowUpRight size={16} />
         </Link>
+        <DeviceTiltControl />
         <button
           className="icon-button effects-toggle"
           disabled={reducedMotion}

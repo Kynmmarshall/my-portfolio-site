@@ -7,6 +7,7 @@ import {
   ArrowUpRight,
   Check,
   Code2,
+  Smartphone,
 } from "lucide-react";
 import { getProject, projects } from "@/content/projects";
 import { ProjectMedia } from "@/components/projects/ProjectMedia";
@@ -50,6 +51,17 @@ export default async function ProjectPage({
           </h1>
           <p>{project.description}</p>
           <div className="detail-actions">
+            {project.playStore && (
+              <a
+                href={project.playStore.url}
+                className="button button-dark"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Smartphone size={17} />
+                Get it on Google Play <ArrowUpRight size={17} />
+              </a>
+            )}
             <a
               href={project.liveUrl}
               target="_blank"
@@ -69,6 +81,22 @@ export default async function ProjectPage({
               </a>
             )}
           </div>
+          {project.playStore && (
+            <div className="store-release">
+              <p className="eyebrow">PUBLISHED ON GOOGLE PLAY / ANDROID</p>
+              <p>
+                Developer:{" "}
+                <a
+                  href={project.playStore.developerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {project.playStore.developer} <ArrowUpRight size={13} />
+                </a>
+              </p>
+              <span className="mono">{project.playStore.packageId}</span>
+            </div>
+          )}
         </header>
         <div className="detail-cover">
           <ProjectMedia
@@ -148,7 +176,11 @@ export default async function ProjectPage({
             <div className="section-heading">
               <h2>A closer look.</h2>
             </div>
-            <MediaGallery images={project.gallery} title={project.title} />
+            <MediaGallery
+              images={project.gallery}
+              title={project.title}
+              landscape={!project.portrait}
+            />
           </>
         )}
         <Link href={`/projects/${next.slug}`} className="next-project">

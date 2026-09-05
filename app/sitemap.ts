@@ -5,6 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     "",
     "/projects",
+    "/expertise",
     "/insights",
     "/resume",
     "/privacy",

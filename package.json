@@ -14,7 +14,9 @@
     "data:github": "node --env-file-if-exists=.env.local --import tsx jobs/refresh-github.ts",
     "data:status": "node --env-file-if-exists=.env.local --import tsx jobs/check-services.ts",
     "assets:prepare": "tsx jobs/prepare-assets.ts",
-    "assets:logos": "tsx jobs/prepare-logos.ts"
+    "assets:logos": "tsx jobs/prepare-logos.ts",
+    "assets:tools": "tsx jobs/prepare-tool-logos.ts",
+    "assets:trip": "tsx jobs/prepare-trip-media.ts"
   },
   "engines": {
     "node": ">=24.0.0 <25"
@@ -26,6 +28,7 @@
     "@gsap/react": "^2.1.2",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
+    "devicon": "2.17.0",
     "framer-motion": "^13.2.0",
     "gsap": "^3.15.0",
     "lucide-react": "^1.41.0",

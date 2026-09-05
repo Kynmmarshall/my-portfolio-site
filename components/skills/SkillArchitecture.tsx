@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Code2, Gamepad2, Layers3, Server } from "lucide-react";
 import { pillars } from "@/content/profile";
+import { TechnologyMark } from "./TechnologyMark";
 
 const icons = { server: Server, game: Gamepad2, code: Code2, layers: Layers3 };
 export function SkillArchitecture() {
@@ -27,7 +28,12 @@ export function SkillArchitecture() {
           {pillars.map((pillar) => {
             const Icon = icons[pillar.icon];
             return (
-              <article className="skill-pillar" key={pillar.id}>
+              <article
+                className="skill-pillar"
+                key={pillar.id}
+                id={pillar.id}
+                aria-labelledby={`${pillar.id}-title`}
+              >
                 <div className="pillar-heading">
                   <span className="pillar-icon">
                     <Icon size={22} />
@@ -35,13 +41,16 @@ export function SkillArchitecture() {
                   <span className="mono">/{pillar.number}</span>
                 </div>
                 <p className="eyebrow">{pillar.label}</p>
-                <h3>{pillar.title}</h3>
+                <h3 id={`${pillar.id}-title`}>{pillar.title}</h3>
                 <p>{pillar.description}</p>
-                <div className="tags">
+                <ul
+                  className="technology-grid"
+                  aria-label={`${pillar.label} technologies and practices`}
+                >
                   {pillar.tools.map((tool) => (
-                    <span key={tool}>{tool}</span>
+                    <TechnologyMark key={tool} name={tool} />
                   ))}
-                </div>
+                </ul>
                 <Link
                   href={`/projects/${pillar.slug}`}
                   className="evidence-link"
@@ -49,6 +58,17 @@ export function SkillArchitecture() {
                   {pillar.evidence}
                   <ArrowUpRight size={17} />
                 </Link>
+                {pillar.id === "full-stack" && (
+                  <a
+                    href="https://github.com/Kynmmarshall/my-portfolio-site"
+                    className="evidence-link portfolio-evidence"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    This portfolio: Next.js, React, TypeScript & Tailwind CSS{" "}
+                    <ArrowUpRight size={17} />
+                  </a>
+                )}
               </article>
             );
           })}

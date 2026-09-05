@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, ArrowRight, Code2 } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Code2, Smartphone } from "lucide-react";
 import type { Project } from "@/content/projects";
 import { ProjectLogo } from "./ProjectLogo";
 
@@ -36,6 +36,16 @@ export function ProjectCard({ project }: { project: Project }) {
           <a href={project.liveUrl} target="_blank" rel="noreferrer">
             Live project <ArrowUpRight size={14} />
           </a>
+          {project.playStore && (
+            <a
+              href={project.playStore.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Smartphone size={14} />
+              Google Play
+            </a>
+          )}
           {project.sourceUrl && (
             <a
               href={project.sourceUrl}
