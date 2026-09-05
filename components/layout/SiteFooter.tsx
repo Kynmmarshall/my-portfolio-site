@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SocialLinks } from "./SocialLinks";
 
@@ -6,6 +7,9 @@ export function SiteFooter() {
     <footer className="site-footer shell">
       <div>
         <Link href="/" className="brand">
+          <span className="brand-mark">
+            <Image src="/media/profile/portrait.webp" alt="" fill sizes="33px" />
+          </span>
           kynmmarshall<span className="brand-dot">.</span>
         </Link>
         <p>Thoughtfully built. Always evolving.</p>

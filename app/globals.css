@@ -129,19 +129,17 @@ svg {
   font-weight: 600;
 }
 .brand-mark {
+  position: relative;
   width: 33px;
   height: 33px;
-  background: var(--ink);
-  color: white;
-  display: grid;
-  grid-auto-flow: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 27px;
-  line-height: 1;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #e7eddf;
+  border: 1px solid var(--line);
 }
-.brand-mark > span {
-  color: var(--lime);
+.brand-mark img {
+  object-fit: cover;
 }
 .brand-dot {
   color: var(--teal);
@@ -1042,7 +1040,7 @@ body {
 }
 .site-footer .brand {
   font-size: 17px;
-  gap: 0;
+  gap: 9px;
 }
 .site-footer p {
   font-size: 10px;

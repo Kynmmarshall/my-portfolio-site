@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -28,7 +29,7 @@ export function SiteHeader() {
           onClick={() => setOpen(false)}
         >
           <span className="brand-mark">
-            k<span>.</span>
+            <Image src="/media/profile/portrait.webp" alt="" fill sizes="33px" />
           </span>
           <span>
             kynmmarshall<span className="brand-dot">.</span>
