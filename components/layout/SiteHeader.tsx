@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ArrowUpRight, Menu, X, Pause, Play } from "lucide-react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 import { DeviceTiltControl } from "@/components/motion/DeviceTiltControl";
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
   { href: "/projects", label: "Work" },
@@ -29,7 +30,12 @@ export function SiteHeader() {
           onClick={() => setOpen(false)}
         >
           <span className="brand-mark">
-            <Image src="/media/profile/portrait.webp" alt="" fill sizes="33px" />
+            <Image
+              src="/media/profile/portrait.webp"
+              alt=""
+              fill
+              sizes="33px"
+            />
           </span>
           <span>
             kynmmarshall<span className="brand-dot">.</span>
@@ -49,6 +55,7 @@ export function SiteHeader() {
         <Link href="/#contact" className="header-contact">
           Let&apos;s talk <ArrowUpRight size={16} />
         </Link>
+        <ThemeToggle />
         <DeviceTiltControl />
         <button
           className="icon-button effects-toggle"

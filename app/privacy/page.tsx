@@ -8,9 +8,11 @@ export default function PrivacyPage() {
       <h2>No advertising or visitor tracking</h2>
       <p>
         This portfolio does not install advertising trackers or collect visitor
-        analytics. Fonts and project media are served locally. Your
-        artistic/wireframe preference is stored in your browser&apos;s local
-        storage, not on our server.
+        analytics. Fonts and project media are served locally. Your visual
+        preferences are stored in your browser&apos;s local storage, not on our
+        server. The color theme follows your device setting on every fresh page
+        load. A manual light or dark selection lasts only for the current visit
+        and is not saved.
       </p>
       <h2>Developer insights</h2>
       <p>

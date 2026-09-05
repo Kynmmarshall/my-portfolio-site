@@ -9,7 +9,7 @@
   margin-bottom: 28px;
 }
 .resume-document {
-  background: #fafbf8f5;
+  background: light-dark(#fafbf8f5, #171a19f5);
   border-top: 4px solid var(--teal);
   padding: 44px;
 }
@@ -33,14 +33,14 @@
   margin: 0 0 17px;
 }
 .resume-role > span {
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   padding-inline: 8px;
 }
 .resume-meta {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   font-size: 11px;
 }
 .resume-meta > span,
@@ -59,7 +59,7 @@
   align-self: center;
   width: 160px;
   aspect-ratio: 1;
-  background: #e7eddf;
+  background: light-dark(#e7eddf, #303b35);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -80,7 +80,7 @@
 }
 .resume-summary p {
   font-size: 12px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   margin: 0 0 9px;
 }
 .resume-publication {
@@ -106,7 +106,7 @@
 }
 .resume-publication p:not(.eyebrow) {
   font-size: 11px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   margin: 0 0 10px;
 }
 .resume-publication .text-link {
@@ -162,7 +162,7 @@
 }
 .resume-capabilities p {
   font-size: 10px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   margin: 0;
 }
 .resume-technologies {
@@ -226,19 +226,19 @@
 }
 .resume-project-heading .resume-project-role {
   font-size: 10px;
-  color: #386850;
+  color: light-dark(#386850, var(--teal));
   margin: 0;
 }
 .resume-project-category {
   font-family: var(--mono);
   font-size: 8px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   margin-left: auto;
 }
 .resume-project > p,
 .resume-project > ul {
   font-size: 11px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   line-height: 1.8;
 }
 .resume-project > ul {
@@ -257,14 +257,14 @@
   font-size: 9px;
 }
 .resume-project-footer > span {
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   line-height: 1.7;
 }
 .resume-project-footer a {
   display: inline-flex;
   gap: 5px;
   align-items: center;
-  color: #285944;
+  color: light-dark(#285944, var(--teal));
   overflow-wrap: anywhere;
 }
 .resume-document-footer {
@@ -274,7 +274,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
-  color: #53614d;
+  color: light-dark(#53614d, var(--muted));
   font-family: var(--mono);
   font-size: 9px;
 }
@@ -302,7 +302,7 @@
   }
   .resume-document {
     padding: 24px 0;
-    background: #fafbf8f5;
+    background: light-dark(#fafbf8f5, #171a19f5);
   }
   .resume-header {
     grid-template-columns: 1fr 100px;

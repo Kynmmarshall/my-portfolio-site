@@ -16,6 +16,7 @@
     "assets:prepare": "tsx jobs/prepare-assets.ts",
     "assets:logos": "tsx jobs/prepare-logos.ts",
     "assets:tools": "tsx jobs/prepare-tool-logos.ts",
+    "assets:icons": "tsx jobs/prepare-site-icons.ts",
     "assets:trip": "tsx jobs/prepare-trip-media.ts"
   },
   "engines": {

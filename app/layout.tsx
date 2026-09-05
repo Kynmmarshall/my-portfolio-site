@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { VisualPreferencesProvider } from "@/context/VisualPreferencesContext";
 import { ReactiveBackground } from "@/components/motion/ReactiveBackground";
+import { ThemeProvider } from "@/context/ThemeProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -32,19 +33,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="system">
       <body>
-        <VisualPreferencesProvider>
-          <a className="skip-link" href="#main">
-            Skip to content
-          </a>
-          <SiteHeader />
-          <main id="main">
-            <ReactiveBackground />
-            {children}
-          </main>
-          <SiteFooter />
-        </VisualPreferencesProvider>
+        <ThemeProvider>
+          <VisualPreferencesProvider>
+            <a className="skip-link" href="#main">
+              Skip to content
+            </a>
+            <SiteHeader />
+            <main id="main">
+              <ReactiveBackground />
+              {children}
+            </main>
+            <SiteFooter />
+          </VisualPreferencesProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
