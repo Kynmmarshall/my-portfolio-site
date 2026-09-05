@@ -6,7 +6,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/projects",
     "/insights",
-    "/status",
     "/resume",
     "/privacy",
     ...projects.map((project) => `/projects/${project.slug}`),

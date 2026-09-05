@@ -1,6 +1,6 @@
 # Kynmmarshall Portfolio
 
-Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a layered portrait hero, mouse/scroll-reactive backgrounds, animated project logos, case studies, locally optimized media, GitHub insights, and timestamped service reachability.
+Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a layered portrait hero, mouse/scroll-reactive backgrounds, animated project logos, case studies, locally optimized media, GitHub insights, and recognizable social-profile links.
 
 ## Run Locally
 
@@ -28,6 +28,8 @@ npm run data:status
 
 These are one-shot application data jobs, not deployment scripts. Run GitHub refreshes every six hours and service checks every five minutes through your chosen scheduler after deployment. There is no request-triggered probing or automatic server timer. Keep the SQLite directory persistent across releases and backed up.
 
+The public Status page has been removed, including its navigation and sitemap links. Existing monitoring jobs, API, and stored observations are retained; running service checks is optional and does not recreate the page.
+
 ## Validate
 
 ```powershell
@@ -45,6 +47,8 @@ Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_
 
 `npm run assets:logos` imports the seven project branding assets listed in `content/logos.ts`. Listings show these logos only; screenshots and gameplay are kept on project detail pages. The header pause control stops logo, portrait, and ambient background motion across the site. OS reduced-motion preferences are respected.
 
+The hero no longer displays an Artistic/Wireframe toggle. GitHub, LinkedIn, itch.io, and email links have labeled logos/icons in both the hero and footer.
+
 ## Main Boundaries
 
 - `app/`: server-rendered routes, metadata, and read-only snapshot APIs.
@@ -56,7 +60,7 @@ Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_
 - `tests/`: deterministic unit tests and Playwright workflows.
 - `docs/`: architecture, provenance, metrics definitions, and VPS runtime contract.
 
-Contact opens the visitor's email application. The legacy Formspree endpoint is not enabled in the new app. Employment dates, certificates, numeric performance claims, and an embedded micro-game have not been invented or added.
+Get in touch opens `mailto:kynmmarshall@gmail.com` with the selected inquiry subject. It requires a configured mailto handler (desktop email app or browser webmail handler); it does not send messages by itself. The plain email link and copy button remain available. Browser tests validate all three subjects and mouse/keyboard activation without opening an external app or sending a message. The legacy Formspree endpoint is not enabled in the new app. Employment dates, certificates, numeric performance claims, and an embedded micro-game have not been invented or added.
 
 <details>
 <summary>Original static portfolio documentation</summary>

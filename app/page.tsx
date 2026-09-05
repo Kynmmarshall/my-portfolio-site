@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ProjectGrid } from "@/components/projects/ProjectCard";
-import { SkillArchitecture } from "@/components/skills/SkillArchitecture";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { Reveal } from "@/components/motion/Reveal";
 import { InsightsPreview } from "@/components/insights/InsightsPreview";
@@ -37,7 +36,6 @@ export default function HomePage() {
           </div>
         </Reveal>
       </section>
-      <SkillArchitecture />
       <section className="shell section">
         <InsightsPreview />
       </section>
@@ -66,6 +64,9 @@ export default function HomePage() {
             is the same: start with the problem, make deliberate choices, and
             keep learning.
           </p>
+          <Link href="/expertise" className="text-link">
+            Explore my expertise <ArrowUpRight size={16} />
+          </Link>
           <div className="about-facts">
             <div>
               <span>BASED IN</span>Cameroon

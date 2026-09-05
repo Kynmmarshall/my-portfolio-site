@@ -9,6 +9,7 @@ import {
   Server,
 } from "lucide-react";
 import { HeroSceneLoader, SceneControls } from "./HeroSceneLoader";
+import { SocialLinks } from "@/components/layout/SocialLinks";
 
 export function HeroSection() {
   return (
@@ -43,6 +44,7 @@ export function HeroSection() {
               Let&apos;s build something <ArrowUpRight size={17} />
             </Link>
           </div>
+          <SocialLinks label="Connect with Marshall" />
         </div>
         <div className="shell hero-bottom">
           <Link href="#work">

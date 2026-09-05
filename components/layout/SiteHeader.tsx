@@ -8,9 +8,8 @@ import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 
 const links = [
   { href: "/projects", label: "Work" },
-  { href: "/#expertise", label: "Expertise" },
+  { href: "/expertise", label: "Expertise" },
   { href: "/insights", label: "Insights" },
-  { href: "/status", label: "Status" },
 ];
 
 export function SiteHeader() {

@@ -4,7 +4,7 @@
 
 One Next.js application, not separate frontend/backend deployments. The homepage, project detail pages, profile, and privacy page are prerendered. Project filtering uses allowlisted URL query values. Unknown project slugs return HTTP 404; loading boundaries are scoped to the dashboard routes so they do not prematurely stream HTTP 200 for unknown projects.
 
-Insights/status pages use explicit runtime rendering and read SQLite snapshots. Their GET APIs never trigger GitHub calls or probe external URLs. Failures cannot hide project content, navigation, or email links.
+The Insights page uses explicit runtime rendering and reads SQLite snapshots. Read-only GET APIs never trigger GitHub calls or probe external URLs. The public Status page and its navigation/sitemap entries have been removed; the existing monitoring API, jobs, and stored observations remain intact. Failures cannot hide project content, navigation, or email links.
 
 The shared layout contains small client islands. Wrapping server-rendered children in the visual preference provider does not make all page content client-rendered.
 
@@ -14,6 +14,7 @@ The shared layout contains small client islands. Wrapping server-rendered childr
 RootLayout
   VisualPreferencesProvider
   SiteHeader
+  SocialLinks (shared by hero and footer)
   Main
     ReactiveBackground
     HomePage
@@ -25,7 +26,6 @@ RootLayout
     ProjectPage
       ProjectMedia -> CaseStudy -> ArchitectureExplorer -> MediaGallery
     InsightsPage -> LanguageBreakdown -> ActivityCharts
-    StatusPage -> StatusDashboard
     ResumePage / PrivacyPage / NotFound
   SiteFooter
 ```
@@ -37,11 +37,13 @@ RootLayout
 - Framer Motion owns one-time section reveals and in-view logo float animation. Content never starts hidden, preserving no-JavaScript access. Project listing cards render only logos, with screenshots and gameplay isolated to detail pages.
 - ReactiveBackground updates CSS background-position variables from mouse and scroll input using a settling animation-frame loop, without React renders on every frame. Content positions and native scrolling are unchanged. Listeners are cleaned up on route, visibility, and preference changes.
 - CSS owns ordinary hover/focus transitions. Reduced motion disables choreography; the canvas can render on demand, pauses offscreen/in hidden tabs, and falls back to the original portrait after context loss. A header control pauses all visual effects from any page.
-- Artistic/wireframe changes contour emphasis in the existing canvas, not the portrait itself. No duplicate WebGL context is created for a mode switch. Browser storage failure falls back to session memory.
+- The hero no longer exposes the Artistic/Wireframe selector. Portrait/background rendering and the motion-pause controls remain intact; existing internal appearance preference support is retained.
 
 The scene has no external HDR/model requests. A local portrait texture and lightweight contour shader produce the visual. No camera, microphone, or geolocation access is requested.
 
 ## Content and Data
+
+Shared SocialLinks presents the existing GitHub, LinkedIn, and itch.io logo assets alongside text labels and an email icon. Only identity-verified profile URLs are included. Get in touch uses a native mailto link to kynmmarshall@gmail.com with a percent-encoded subject based on the selected inquiry type. Browser tests verify pointer/keyboard activation while intercepting the external-protocol launch; actual email-client setup and delivery remain outside the site's control.
 
 `content/projects.ts` owns editorial records and the five exact DuckDNS URLs. Project role, stack, evidence links, and media are independent of runtime metrics. The secondary collection includes Math Runner and Plane Game.
 

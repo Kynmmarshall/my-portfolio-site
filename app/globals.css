@@ -304,6 +304,55 @@ svg {
   display: flex;
   gap: 13px;
 }
+.social-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  font-size: 11px;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+}
+.social-links a:hover,
+.social-links a:focus-visible {
+  color: var(--teal);
+  border-bottom-color: currentColor;
+}
+.social-logo {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.hero-inner .social-links {
+  margin-top: 18px;
+}
+.site-footer .social-links {
+  gap: 8px 18px;
+}
+.site-footer .footer-links {
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .hero-inner .social-links {
+    gap: 6px 16px;
+  }
+  .hero-inner .social-links a {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .hero-inner .social-links img,
+  .hero-inner .social-links svg {
+    width: 18px;
+    height: 18px;
+  }
+}
 .hero-bottom {
   position: absolute;
   bottom: 25px;
@@ -1765,7 +1814,7 @@ svg {
     margin-left: auto;
   }
   .hero-scene {
-    top: 310px;
+    top: 375px;
   }
   .scene-poster {
     object-position: 70% center;

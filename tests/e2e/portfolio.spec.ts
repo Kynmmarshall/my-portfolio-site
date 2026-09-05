@@ -21,6 +21,12 @@ test("portrait depth and background motion render across desktop and mobile", as
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.locator("h1")).toContainText("Kamdeu");
+  await expect(
+    page.getByRole("group", { name: "Scene appearance" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /^(Artistic|Wireframe)$/ }),
+  ).toHaveCount(0);
   const canvas = page.locator(".hero-scene canvas");
   await expect(page.locator(".portrait-fallback")).toHaveAttribute(
     "src",
@@ -66,18 +72,9 @@ test("portrait depth and background motion render across desktop and mobile", as
   await sharp(await canvasPixels(canvas))
     .webp({ quality: 88 })
     .toFile(".data/screenshots/portrait-frame.webp");
-  await page.getByRole("button", { name: "Wireframe", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Wireframe", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await expect(canvas).toBeVisible();
-  await page.screenshot({ path: ".data/screenshots/wireframe.png" });
-  expect(Buffer.compare(firstFrame, await canvasPixels(canvas))).not.toBe(0);
-  await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Wireframe", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Artistic", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Resume animation", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Pause animation", exact: true })
     .click();
@@ -88,6 +85,9 @@ test("portrait depth and background motion render across desktop and mobile", as
     { width: 1920, height: 1080 },
   ]) {
     await page.setViewportSize(viewport);
+    await expect(
+      page.getByRole("button", { name: /^(Artistic|Wireframe)$/ }),
+    ).toHaveCount(0);
     await expect(canvas).toBeVisible();
     await expect
       .poll(
@@ -209,6 +209,7 @@ test("reduced motion, navigation, contact and accessibility", async ({
     page.getByRole("button", { name: "Motion disabled by system preference" }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(page.locator('a[href="/status"]')).toHaveCount(0);
   await page
     .getByRole("navigation", { name: "Mobile navigation" })
     .getByRole("link", { name: "Contact", exact: true })
@@ -231,9 +232,9 @@ test("reduced motion, navigation, contact and accessibility", async ({
   ).toEqual([]);
   await page.goto("/insights");
   await expect(page.locator("h1")).toContainText("Behind the commits");
-  await page.goto("/status");
-  await expect(page.locator(".service-row")).toHaveCount(5);
-  await expect(page.locator(".service-foot").first()).toContainText("coverage");
+  const removedStatus = await page.goto("/status");
+  expect(removedStatus?.status()).toBe(404);
+  await expect(page.locator(".service-row")).toHaveCount(0);
 });
 
 test("gameplay previews, dashboard accessibility and full-page composition", async ({
@@ -261,7 +262,7 @@ test("gameplay previews, dashboard accessibility and full-page composition", asy
         .evaluate((video) => (video as HTMLVideoElement).paused),
     )
     .toBe(true);
-  for (const path of ["/insights", "/status", "/projects/pick-my-dish"]) {
+  for (const path of ["/insights", "/projects/pick-my-dish"]) {
     await page.goto(path);
     const result = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])

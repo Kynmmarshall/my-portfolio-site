@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { ScanFace, Grid3X3, Pause, Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 
@@ -65,24 +65,9 @@ export function HeroSceneLoader() {
   );
 }
 export function SceneControls() {
-  const { mode, setMode, paused, setPaused, reducedMotion } =
-    useVisualPreferences();
+  const { paused, setPaused, reducedMotion } = useVisualPreferences();
   return (
     <div className="scene-controls">
-      <div className="segmented" role="group" aria-label="Scene appearance">
-        <button
-          aria-pressed={mode === "artistic"}
-          onClick={() => setMode("artistic")}
-        >
-          <ScanFace size={13} /> Artistic
-        </button>
-        <button
-          aria-pressed={mode === "wireframe"}
-          onClick={() => setMode("wireframe")}
-        >
-          <Grid3X3 size={13} /> Wireframe
-        </button>
-      </div>
       <button
         className="icon-button"
         disabled={reducedMotion}
