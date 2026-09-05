@@ -11,6 +11,12 @@ export function ContactSection() {
   const [intent, setIntent] = useState("A project");
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
+  const gmailQuery = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: profile.email,
+    su: `${intent} / Portfolio inquiry`,
+  });
   async function copyEmail() {
     try {
       await navigator.clipboard.writeText(profile.email);
@@ -60,6 +66,14 @@ export function ContactSection() {
           >
             <Mail size={18} /> Get in touch <ArrowUpRight size={18} />
           </a>
+          <a
+            href={`https://mail.google.com/mail/?${gmailQuery}`}
+            className="text-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Mail size={15} /> Compose in Gmail <ArrowUpRight size={15} />
+          </a>
           <div className="email-row">
             <a href={`mailto:${profile.email}`}>{profile.email}</a>
             <button
@@ -84,7 +98,13 @@ export function ContactSection() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image src={whatsappLogo} alt="" width={20} height={20} className="whatsapp-logo" />
+            <Image
+              src={whatsappLogo}
+              alt=""
+              width={20}
+              height={20}
+              className="whatsapp-logo"
+            />
             WhatsApp: {profile.phoneDisplay} <ArrowUpRight size={15} />
           </a>
           <Link href="/resume" className="text-link">

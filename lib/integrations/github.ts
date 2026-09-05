@@ -5,7 +5,6 @@ import {
   type Analytics,
   type ActivityDay,
 } from "../schemas/analytics.ts";
-import { readSnapshot, saveSnapshot } from "../storage/database.ts";
 
 const repositorySchema = z.object({
   name: z.string(),
@@ -36,7 +35,11 @@ const calendarSchema = z.object({
 });
 const username = "Kynmmarshall";
 
-async function githubJson(path: string, body?: unknown): Promise<unknown> {
+async function githubJson(
+  path: string,
+  signal: AbortSignal,
+  body?: unknown,
+): Promise<unknown> {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": "Kynmmarshall-Portfolio",
@@ -46,8 +49,9 @@ async function githubJson(path: string, body?: unknown): Promise<unknown> {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   const response = await fetch(`https://api.github.com${path}`, {
     headers,
+    cache: "no-store",
     ...(body ? { method: "POST", body: JSON.stringify(body) } : {}),
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
   });
   if (!response.ok)
     throw new Error(
@@ -57,6 +61,7 @@ async function githubJson(path: string, body?: unknown): Promise<unknown> {
 }
 
 export async function collectGithub(): Promise<Analytics> {
+  const signal = AbortSignal.timeout(25000);
   const repositories: z.infer<typeof repositorySchema>[] = [];
   for (let page = 1; page <= 100; page++) {
     const batch = z
@@ -64,6 +69,7 @@ export async function collectGithub(): Promise<Analytics> {
       .parse(
         await githubJson(
           `/users/${username}/repos?type=owner&per_page=100&page=${page}`,
+          signal,
         ),
       );
     repositories.push(...batch);
@@ -78,57 +84,42 @@ export async function collectGithub(): Promise<Analytics> {
       repo.owner.login.toLowerCase() === username.toLowerCase(),
   );
   const languages: Record<string, number>[] = [];
-  let partial = false;
-  for (const repository of included) {
-    const key = `languages:${repository.name}`;
-    const cached = readSnapshot(key, languageMap);
-    if (cached && Date.now() - Date.parse(cached.collectedAt) < 86_400_000) {
-      languages.push(cached.data);
-      continue;
-    }
-    try {
-      const data = languageMap.parse(
-        await githubJson(
-          `/repos/${username}/${encodeURIComponent(repository.name)}/languages`,
-        ),
-      );
-      languages.push(data);
-      saveSnapshot(key, data, new Date().toISOString());
-    } catch {
-      partial = true;
-      if (cached) languages.push(cached.data);
-      break;
-    }
+  for (let offset = 0; offset < included.length; offset += 5) {
+    languages.push(
+      ...(await Promise.all(
+        included
+          .slice(offset, offset + 5)
+          .map(async (repository) =>
+            languageMap.parse(
+              await githubJson(
+                `/repos/${username}/${encodeURIComponent(repository.name)}/languages`,
+                signal,
+              ),
+            ),
+          ),
+      )),
+    );
   }
-  const previous = readSnapshot("github", analyticsSchema);
   let days: ActivityDay[] = [];
   let contributions: number | null = null;
   let activitySource: Analytics["activitySource"] = "unavailable";
   if (process.env.GITHUB_TOKEN) {
-    try {
-      const response = calendarSchema.parse(
-        await githubJson("/graphql", {
-          query: `query { user(login: "${username}") { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } } } } }`,
-        }),
-      );
-      const calendar =
-        response.data.user.contributionsCollection.contributionCalendar;
-      days = calendar.weeks.flatMap((week) =>
-        week.contributionDays.map((day) => ({
-          date: day.date,
-          count: day.contributionCount,
-        })),
-      );
-      contributions = calendar.totalContributions;
-      activitySource = "github-graphql";
-    } catch {
-      partial = true;
-    }
-  }
-  if (partial && previous)
-    throw new Error(
-      "Partial GitHub refresh; retaining the complete last-good snapshot",
+    const response = calendarSchema.parse(
+      await githubJson("/graphql", signal, {
+        query: `query { user(login: "${username}") { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } } } } }`,
+      }),
     );
+    const calendar =
+      response.data.user.contributionsCollection.contributionCalendar;
+    days = calendar.weeks.flatMap((week) =>
+      week.contributionDays.map((day) => ({
+        date: day.date,
+        count: day.contributionCount,
+      })),
+    );
+    contributions = calendar.totalContributions;
+    activitySource = "github-graphql";
+  }
   return analyticsSchema.parse({
     username,
     repositories: repositories.length,
@@ -141,7 +132,7 @@ export async function collectGithub(): Promise<Analytics> {
     days,
     contributions,
     activitySource,
-    partial,
+    partial: false,
     collectedAt: new Date().toISOString(),
   });
 }

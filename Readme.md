@@ -31,14 +31,18 @@ The app works without credentials; missing data is explicitly labeled. Configure
 
 - `SITE_URL`: the actual public portfolio origin, used for sitemap and social metadata.
 - `GITHUB_TOKEN`: a minimum-permission GitHub token for contribution-calendar queries and higher API quotas. Repository/language refreshes also work without a token, subject to public rate limits.
-- `PORTFOLIO_DB_PATH`: optional SQLite file path; defaults to `.data/portfolio.sqlite`. Node 24 currently emits an experimental SQLite warning.
+- `PORTFOLIO_DB_PATH`: SQLite path for optional monitoring/legacy export jobs only; defaults to `.data/portfolio.sqlite`. Insights no longer uses SQLite.
+
+On Vercel, add `GITHUB_TOKEN` under Project Settings > Environment Variables for Production (and Preview if needed), set `SITE_URL` to the deployed origin, and redeploy. Use Node.js 24.x. Keep the token server-only; never use a `NEXT_PUBLIC_` prefix or commit it. A valid token is needed for the contribution calendar and recommended to avoid GitHub's low unauthenticated API quota. No writable database, cron, or refresh command is required for Insights.
+
+The Insights page and API share Next.js Data Cache snapshots with a six-hour revalidation interval. The first request fetches GitHub data; requests after expiry serve cached data while revalidating in the background. There is no idle-time timer. Failed refreshes preserve the previous cached snapshot; a cold failure returns unavailable (API 503, not cached) until a later successful request. Raw upstream responses are not separately cached. Requests have a 25-second total deadline and language lookups run in batches of at most five.
 
 ```powershell
 npm run data:github
 npm run data:status
 ```
 
-These are one-shot application data jobs, not deployment scripts. Run GitHub refreshes every six hours and service checks every five minutes through your chosen scheduler after deployment. There is no request-triggered probing or automatic server timer. Keep the SQLite directory persistent across releases and backed up.
+These are optional one-shot jobs, not deployment scripts. `data:github` exports a legacy SQLite snapshot and does not populate the web cache. Only retained service monitoring needs a separate five-minute schedule and persistent SQLite directory. No HTTP request triggers service probing. Local filesystem SQLite is not suitable for persistent Vercel monitoring.
 
 The public Status page has been removed, including its navigation and sitemap links. Existing monitoring jobs, API, and stored observations are retained; running service checks is optional and does not recreate the page.
 
@@ -78,7 +82,7 @@ The hero no longer displays an Artistic/Wireframe toggle. GitHub, LinkedIn, itch
 - `tests/`: deterministic unit tests and Playwright workflows.
 - `docs/`: architecture, provenance, metrics definitions, and VPS runtime contract.
 
-Get in touch opens `mailto:kynmmarshall@gmail.com` with the selected inquiry subject. It requires a configured mailto handler (desktop email app or browser webmail handler); it does not send messages by itself. The plain email link and copy button remain available. Browser tests validate all three subjects and mouse/keyboard activation without opening an external app or sending a message. The legacy Formspree endpoint is not enabled in the new app. Employment dates, certificates, numeric performance claims, and an embedded micro-game have not been invented or added.
+Get in touch opens `mailto:kynmmarshall@gmail.com` with the selected inquiry subject. It requires a configured mailto handler (desktop email app or browser webmail handler); it does not send messages by itself. Compose in Gmail is an explicit browser-based alternative, with the same recipient and selected subject, and requires a Gmail login. The plain email link and copy button remain available. Browser tests intercept protocol and webmail navigation; they do not verify an installed mail app or send messages. The legacy Formspree endpoint is not enabled in the new app. Employment dates, certificates, numeric performance claims, and an embedded micro-game have not been invented or added.
 
 <details>
 <summary>Original static portfolio documentation</summary>

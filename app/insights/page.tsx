@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import { ArrowUpRight, Code2, GitCommitHorizontal, Star } from "lucide-react";
-import { readInsights } from "@/lib/server/read-models";
+import { readInsights } from "@/lib/server/insights";
 import { LanguageBreakdown } from "@/components/insights/LanguageBreakdown";
 import { ActivityCharts } from "@/components/insights/ActivityCharts";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 60;
 export const metadata: Metadata = {
   title: "Developer insights",
   description:
     "Public repository language distribution and GitHub developer activity with transparent data sources.",
 };
-export default function InsightsPage() {
-  const snapshot = readInsights();
+export default async function InsightsPage() {
+  const snapshot = await readInsights();
   const data = snapshot.data;
   return (
     <div className="shell insights-page">
@@ -98,8 +100,9 @@ export default function InsightsPage() {
           measure of working hours, productivity, or experience.
         </p>
         <p>
-          Refreshes are separate server jobs. A failed refresh preserves the
-          previous successful snapshot and its original timestamp. Snapshots
+          GitHub data is fetched on the server and cached. Requests trigger
+          background revalidation after six hours; a failed refresh preserves
+          the previous cached snapshot and its original timestamp. Snapshots
           older than 24 hours are labeled stale. A missing value is never
           treated as zero.
         </p>

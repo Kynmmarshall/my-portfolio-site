@@ -115,7 +115,8 @@ svg {
   color: light-dark(#737e75, var(--muted));
 }
 .site-header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 30;
   border-bottom: 1px solid var(--line);
   background: var(--paper);
@@ -1938,11 +1939,15 @@ body {
   .mobile-menu {
     display: flex;
     flex-direction: column;
+    max-height: calc(100dvh - 71px);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
     padding: 12px 20px 24px;
     border-top: 1px solid var(--line);
   }
   .mobile-menu a {
     display: flex;
+    flex-shrink: 0;
     justify-content: space-between;
     padding: 13px 0;
     border-bottom: 1px solid var(--line);

@@ -1,11 +1,6 @@
 import "server-only";
-import {
-  analyticsSchema,
-  snapshot,
-  type Analytics,
-  type Snapshot,
-} from "../schemas/analytics";
-import { getDatabase, readSnapshot } from "../storage/database";
+import { snapshot, type Snapshot } from "../schemas/analytics";
+import { getDatabase } from "../storage/database";
 import {
   serviceTargets,
   type Sample,
@@ -13,18 +8,6 @@ import {
 } from "../monitoring/targets";
 import { summarizeSamples } from "../monitoring/aggregate";
 
-export function readInsights(): Snapshot<Analytics> {
-  try {
-    const cached = readSnapshot("github", analyticsSchema);
-    return snapshot(
-      cached?.data ?? null,
-      cached?.collectedAt ?? null,
-      86_400_000,
-    );
-  } catch {
-    return snapshot<Analytics>(null, null, 86_400_000);
-  }
-}
 export function readStatus(): Snapshot<ServiceSummary[]> & {
   evaluatedAt: number;
 } {

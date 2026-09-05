@@ -4,7 +4,7 @@
 
 One Next.js application, not separate frontend/backend deployments. The homepage, project detail pages, profile, and privacy page are prerendered. Project filtering uses allowlisted URL query values. Unknown project slugs return HTTP 404; loading boundaries are scoped to the dashboard routes so they do not prematurely stream HTTP 200 for unknown projects.
 
-The Insights page uses explicit runtime rendering and reads SQLite snapshots. Read-only GET APIs never trigger GitHub calls or probe external URLs. The public Status page and its navigation/sitemap entries have been removed; the existing monitoring API, jobs, and stored observations remain intact. Failures cannot hide project content, navigation, or email links.
+The Insights page uses explicit runtime rendering and shares a server-only Next Data Cache reader with `/api/insights`. A cold request fetches GitHub; subsequent requests reuse the validated aggregate, with request-triggered background revalidation after six hours. Failed refreshes leave the last-good cache untouched. Insights has no SQLite imports or filesystem requirements. The status API still only reads monitoring snapshots and never probes external URLs. The public Status page remains removed. Failures cannot hide project content, navigation, or email links.
 
 The shared layout contains small client islands. Wrapping server-rendered children in the visual preference provider does not make all page content client-rendered.
 
@@ -65,13 +65,15 @@ The terrain browser tests distinguish visual capture from performance: `canvas-r
 
 Shared SocialLinks presents the existing GitHub, LinkedIn, and itch.io logo assets alongside text labels and an email icon. Only identity-verified profile URLs are included. Get in touch uses a native mailto link to kynmmarshall@gmail.com with a percent-encoded subject based on the selected inquiry type. Browser tests verify pointer/keyboard activation while intercepting the external-protocol launch; actual email-client setup and delivery remain outside the site's control.
 
+Compose in Gmail provides a browser-based alternative with the selected subject, without guessing whether a mailto handler exists or automatically opening multiple destinations. It opens only after an explicit click and sends no email automatically.
+
 `content/projects.ts` owns editorial records and the five exact DuckDNS URLs. Project role, stack, evidence links, and media are independent of runtime metrics. The secondary collection includes Math Runner and Plane Game.
 
 Optional project playStore metadata holds the verified app URL, package ID, publisher display name, and public developer URL. Fruit Collector has a verified listing; other projects do not receive speculative store links. Profile navigation points to `/resume`, whose server-rendered ResumeDocument reuses the same project/profile data and logo components. Its route-scoped stylesheet defines readable screen and A4 print layouts. No employment history or qualifications were invented for the document.
 
 `content/github-stack.ts` records the reviewed 2026-09-05 profile stack. A unit test requires every entry to appear in the four expertise pillars. TechnologyMark uses locally bundled Devicon logos, imported game-tool logos, and meaningful symbols for nonbranded practices. Profile-listed entries are distinct from project-evidenced work. This is a reviewed snapshot, not live scraping during page rendering.
 
-Zod validates GitHub responses and persisted analytics before they become read models. SQLite stores last-good snapshots, service samples, and expiring job locks. The server-only read facade is the only data access used by routes. Browser components receive serializable data, never tokens, database connections, or probe implementations.
+Zod validates GitHub responses and cached analytics before they become read models. `lib/server/insights.ts` uses `unstable_cache`, supported by the current non-Cache-Components configuration, to store complete aggregates. Cache keys distinguish authenticated/public collection without including the token. GitHub requests read `GITHUB_TOKEN` only on the server. SQLite remains only for legacy exports, service samples and job locks. Browser components receive serializable data, never tokens, database connections, or probe implementations.
 
 Monitoring takes no visitor-supplied URLs. Host/origin allowlists, public IPv4 checks, pinned DNS resolution, same-origin redirect restrictions, and bounded requests constrain outbound probes. This is not a general-purpose URL proxy.
 
