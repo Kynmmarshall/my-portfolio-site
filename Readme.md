@@ -1,3 +1,64 @@
+# Kynmmarshall Portfolio
+
+Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a React Three Fiber scene, project case studies, locally optimized media, GitHub insights, and timestamped service reachability.
+
+## Run Locally
+
+Requires Node.js 24.x and npm. The original static site files remain untouched.
+
+```powershell
+npm ci
+npm run dev
+```
+
+Open http://localhost:3000. For an optimized local build, run `npm run build` followed by `npm start`.
+
+## Data Configuration
+
+The app works without credentials; missing data is explicitly labeled. Configure optional values in `.env.local` using `.env.example` as the field reference. Never expose a token through a `NEXT_PUBLIC_` variable.
+
+- `SITE_URL`: the actual public portfolio origin, used for sitemap and social metadata.
+- `GITHUB_TOKEN`: a minimum-permission GitHub token for contribution-calendar queries and higher API quotas. Repository/language refreshes also work without a token, subject to public rate limits.
+- `PORTFOLIO_DB_PATH`: optional SQLite file path; defaults to `.data/portfolio.sqlite`. Node 24 currently emits an experimental SQLite warning.
+
+```powershell
+npm run data:github
+npm run data:status
+```
+
+These are one-shot application data jobs, not deployment scripts. Run GitHub refreshes every six hours and service checks every five minutes through your chosen scheduler after deployment. There is no request-triggered probing or automatic server timer. Keep the SQLite directory persistent across releases and backed up.
+
+## Validate
+
+```powershell
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_URL` selects another origin. They cover canvas pixels, motion, responsive overflow, route status, links, media, gallery focus, and accessibility. Tests capture screenshots under `.data/screenshots/` and generate the real 3D fallback poster.
+
+`npm run assets:prepare` downloads the source-attributed media inventory, creates WebP images and short MP4 previews, and captures Trip-io. Existing optimized assets are already included. FFmpeg and Playwright are development-only dependencies.
+
+## Main Boundaries
+
+- `app/`: server-rendered routes, metadata, and read-only snapshot APIs.
+- `components/`: layout, hero/3D, motion, projects, skills, insights, and status.
+- `content/`: reviewed profile, project collection, and source media URLs.
+- `context/` and `hooks/`: visual preferences and browser visibility.
+- `lib/`: validated schemas, GitHub/probe adapters, pure aggregates, SQLite storage, server-only read models.
+- `jobs/`: explicit data refresh and asset preparation entrypoints.
+- `tests/`: deterministic unit tests and Playwright workflows.
+- `docs/`: architecture, provenance, metrics definitions, and VPS runtime contract.
+
+Contact opens the visitor's email application. The legacy Formspree endpoint is not enabled in the new app. Employment dates, certificates, numeric performance claims, and an embedded micro-game have not been invented or added.
+
+<details>
+<summary>Original static portfolio documentation</summary>
+
 Portfolio Website
 A modern, responsive portfolio website showcasing my skills, projects, and professional background as a Software Engineer and Game Developer.
 
@@ -137,3 +198,5 @@ LinkedIn: LinkedIn Profile
 Email: [Add your email]
 
 Itch.io: kynmarshall.itch.io
+
+</details>

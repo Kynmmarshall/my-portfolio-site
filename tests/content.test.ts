@@ -11,11 +11,15 @@ test("production projects retain their exact deployment destinations", () => {
     "fruit-collector": "https://fruitcollector.duckdns.org",
   };
   assert.equal(featuredProjects.length, 5);
-  for (const [slug, url] of Object.entries(expected)) assert.equal(getProject(slug)?.liveUrl, url);
+  for (const [slug, url] of Object.entries(expected))
+    assert.equal(getProject(slug)?.liveUrl, url);
 });
 
 test("projects have unique routes and HTTPS actions", () => {
-  assert.equal(new Set(projects.map((project) => project.slug)).size, projects.length);
+  assert.equal(
+    new Set(projects.map((project) => project.slug)).size,
+    projects.length,
+  );
   for (const project of projects) {
     assert.equal(new URL(project.liveUrl).protocol, "https:");
     assert.ok(project.evidence.length > 0);

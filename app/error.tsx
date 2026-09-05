@@ -1,2 +1,13 @@
 "use client";
-export default function ErrorPage({ reset }: { reset: () => void }) { return <div className="shell prose-page"><p className="eyebrow">SOMETHING WENT WRONG</p><h1>A small interruption.</h1><p>Please try again, or reach me at kynmmarshall@gmail.com.</p><button className="button button-dark" onClick={reset}>Try again</button></div>; }
+export default function ErrorPage({ reset }: { reset: () => void }) {
+  return (
+    <div className="shell prose-page">
+      <p className="eyebrow">SOMETHING WENT WRONG</p>
+      <h1>A small interruption.</h1>
+      <p>Please try again, or reach me at kynmmarshall@gmail.com.</p>
+      <button className="button button-dark" onClick={reset}>
+        Try again
+      </button>
+    </div>
+  );
+}

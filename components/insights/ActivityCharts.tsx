@@ -3,10 +3,95 @@ import type { ActivityDay } from "@/lib/schemas/analytics";
 import { weeklyActivity } from "@/lib/analytics/aggregate";
 
 export function ActivityCharts({ days }: { days: ActivityDay[] }) {
-  if (!days.length) return <div className="data-empty"><GitCommitHorizontal size={28} /><h3>Activity is not connected yet.</h3><p>Contribution data will appear after a successful authenticated GitHub refresh. No estimated activity is shown.</p><a className="text-link" href="https://github.com/Kynmmarshall" target="_blank" rel="noreferrer">View activity on GitHub</a></div>;
+  if (!days.length)
+    return (
+      <div className="data-empty">
+        <GitCommitHorizontal size={28} />
+        <h3>Activity is not connected yet.</h3>
+        <p>
+          Contribution data will appear after a successful authenticated GitHub
+          refresh. No estimated activity is shown.
+        </p>
+        <a
+          className="text-link"
+          href="https://github.com/Kynmmarshall"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View activity on GitHub
+        </a>
+      </div>
+    );
   const max = Math.max(1, ...days.map((day) => day.count));
   const weekly = weeklyActivity(days);
   const maxWeekly = Math.max(1, ...weekly.map((week) => week.count));
   const padding = new Date(`${days[0].date}T00:00:00Z`).getUTCDay();
-  return <><div className="heatmap-scroll"><div className="contribution-heatmap" role="img" aria-label={`${days.reduce((total, day) => total + day.count, 0)} contributions across ${days.length} days`}>{Array.from({ length: padding }, (_, index) => <span key={`pad-${index}`} className="heatmap-pad" />)}{days.map((day) => <span key={day.date} title={`${day.date}: ${day.count} contributions`} style={{ background: day.count ? `color-mix(in srgb, #177567 ${30 + day.count / max * 70}%, #e9eee4)` : "#e9eee4" }} />)}</div></div><div className="chart-axis"><span>{days[0].date}</span><span>{days.at(-1)?.date}</span></div><div className="weekly-heading"><Activity size={16} /><h3>Weekly rhythm</h3><span className="mono">GITHUB CONTRIBUTIONS / UTC</span></div><div className="weekly-chart" role="img" aria-label="Weekly contribution totals">{weekly.map((week) => <div key={week.date} title={`Week of ${week.date}: ${week.count}`}><span style={{ height: `${week.count / maxWeekly * 100}%` }} /></div>)}</div><details className="data-details"><summary>View contribution data</summary><div className="data-table-scroll"><table><caption>GitHub contribution totals by day</caption><thead><tr><th scope="col">Date (UTC)</th><th scope="col">Contributions</th></tr></thead><tbody>{days.map((day) => <tr key={day.date}><td>{day.date}</td><td>{day.count}</td></tr>)}</tbody></table></div></details></>;
+  return (
+    <>
+      <div className="heatmap-scroll">
+        <div
+          className="contribution-heatmap"
+          role="img"
+          aria-label={`${days.reduce((total, day) => total + day.count, 0)} contributions across ${days.length} days`}
+        >
+          {Array.from({ length: padding }, (_, index) => (
+            <span key={`pad-${index}`} className="heatmap-pad" />
+          ))}
+          {days.map((day) => (
+            <span
+              key={day.date}
+              title={`${day.date}: ${day.count} contributions`}
+              style={{
+                background: day.count
+                  ? `color-mix(in srgb, #177567 ${30 + (day.count / max) * 70}%, #e9eee4)`
+                  : "#e9eee4",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="chart-axis">
+        <span>{days[0].date}</span>
+        <span>{days.at(-1)?.date}</span>
+      </div>
+      <div className="weekly-heading">
+        <Activity size={16} />
+        <h3>Weekly rhythm</h3>
+        <span className="mono">GITHUB CONTRIBUTIONS / UTC</span>
+      </div>
+      <div
+        className="weekly-chart"
+        role="img"
+        aria-label="Weekly contribution totals"
+      >
+        {weekly.map((week) => (
+          <div key={week.date} title={`Week of ${week.date}: ${week.count}`}>
+            <span style={{ height: `${(week.count / maxWeekly) * 100}%` }} />
+          </div>
+        ))}
+      </div>
+      <details className="data-details">
+        <summary>View contribution data</summary>
+        <div className="data-table-scroll">
+          <table>
+            <caption>GitHub contribution totals by day</caption>
+            <thead>
+              <tr>
+                <th scope="col">Date (UTC)</th>
+                <th scope="col">Contributions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {days.map((day) => (
+                <tr key={day.date}>
+                  <td>{day.date}</td>
+                  <td>{day.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </>
+  );
 }

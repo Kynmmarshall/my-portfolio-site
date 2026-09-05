@@ -7,5 +7,9 @@ const subscribe = (callback: () => void) => {
   return () => document.removeEventListener("visibilitychange", callback);
 };
 export function usePageVisibility() {
-  return useSyncExternalStore(subscribe, () => !document.hidden, () => true);
+  return useSyncExternalStore(
+    subscribe,
+    () => !document.hidden,
+    () => true,
+  );
 }

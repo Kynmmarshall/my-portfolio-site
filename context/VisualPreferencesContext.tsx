@@ -1,32 +1,80 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useSyncExternalStore,
+  useState,
+  type ReactNode,
+} from "react";
 
-type Preferences = { mode: "artistic" | "wireframe"; setMode: (mode: "artistic" | "wireframe") => void; paused: boolean; setPaused: (paused: boolean) => void; reducedMotion: boolean };
+type Preferences = {
+  mode: "artistic" | "wireframe";
+  setMode: (mode: "artistic" | "wireframe") => void;
+  paused: boolean;
+  setPaused: (paused: boolean) => void;
+  reducedMotion: boolean;
+};
 const VisualContext = createContext<Preferences | null>(null);
+let memoryMode: Preferences["mode"] | null = null;
 const subscribe = (callback: () => void) => {
   const media = window.matchMedia("(prefers-reduced-motion: reduce)");
   media.addEventListener("change", callback);
   return () => media.removeEventListener("change", callback);
 };
-const getReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const getReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const subscribeStorage = (callback: () => void) => {
   window.addEventListener("storage", callback);
   window.addEventListener("scene-preference", callback);
-  return () => { window.removeEventListener("storage", callback); window.removeEventListener("scene-preference", callback); };
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("scene-preference", callback);
+  };
 };
 const getMode = (): Preferences["mode"] => {
-  try { return localStorage.getItem("scene-mode") === "wireframe" ? "wireframe" : "artistic"; } catch { return "artistic"; }
+  if (memoryMode) return memoryMode;
+  try {
+    return localStorage.getItem("scene-mode") === "wireframe"
+      ? "wireframe"
+      : "artistic";
+  } catch {
+    return "artistic";
+  }
 };
 
-export function VisualPreferencesProvider({ children }: { children: ReactNode }) {
-  const mode = useSyncExternalStore(subscribeStorage, getMode, () => "artistic" as const);
-  const reducedMotion = useSyncExternalStore(subscribe, getReducedMotion, () => true);
+export function VisualPreferencesProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const mode = useSyncExternalStore(
+    subscribeStorage,
+    getMode,
+    () => "artistic" as const,
+  );
+  const reducedMotion = useSyncExternalStore(
+    subscribe,
+    getReducedMotion,
+    () => true,
+  );
   const [paused, setPaused] = useState(false);
   function setMode(nextMode: Preferences["mode"]) {
-    try { localStorage.setItem("scene-mode", nextMode); window.dispatchEvent(new Event("scene-preference")); } catch { /* Storage can be unavailable in private browsing. */ }
+    memoryMode = nextMode;
+    try {
+      localStorage.setItem("scene-mode", nextMode);
+    } catch {
+      memoryMode = nextMode;
+    }
+    window.dispatchEvent(new Event("scene-preference"));
   }
-  return <VisualContext.Provider value={{ mode, setMode, paused, setPaused, reducedMotion }}>{children}</VisualContext.Provider>;
+  return (
+    <VisualContext.Provider
+      value={{ mode, setMode, paused, setPaused, reducedMotion }}
+    >
+      {children}
+    </VisualContext.Provider>
+  );
 }
 
 export function useVisualPreferences() {
