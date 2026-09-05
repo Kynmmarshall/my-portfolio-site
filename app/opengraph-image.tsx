@@ -1,0 +1,5 @@
+import { ImageResponse } from "next/og";
+export const alt = "Kynmmarshall - Software, systems and a little play";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+export default function OpenGraphImage() { return new ImageResponse(<div style={{ display: "flex", flexDirection: "column", background: "#edf2e7", color: "#202725", height: "100%", width: "100%", padding: "75px", justifyContent: "space-between" }}><div style={{ display: "flex", fontSize: 26 }}>kynmmarshall.</div><div style={{ display: "flex", flexDirection: "column", fontSize: 80, lineHeight: 1.05 }}><span>Software, systems</span><span style={{ color: "#147668" }}>& a little play.</span></div><div style={{ display: "flex", fontSize: 22 }}>Kamdeu Yamdjeuson Neil Marshall / Software engineer</div></div>, size); }
