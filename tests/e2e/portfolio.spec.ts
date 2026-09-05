@@ -5,13 +5,15 @@ import { mkdir } from "node:fs/promises";
 import { featuredProjects } from "../../content/projects";
 
 async function canvasPixels(canvas: Locator) {
-  const dataUrl = await canvas.evaluate((element) =>
-    (element as HTMLCanvasElement).toDataURL("image/png"),
+  const dataUrl = await canvas.evaluate(
+    (element) => (element as HTMLCanvasElement).toDataURL("image/png"),
+    undefined,
+    { timeout: 5000 },
   );
   return Buffer.from(dataUrl.split(",")[1], "base64");
 }
 
-test("3D scene renders, moves, switches mode and remains readable on mobile", async ({
+test("portrait depth and background motion render across desktop and mobile", async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -20,6 +22,10 @@ test("3D scene renders, moves, switches mode and remains readable on mobile", as
   await page.goto("/");
   await expect(page.locator("h1")).toContainText("Kamdeu");
   const canvas = page.locator(".hero-scene canvas");
+  await expect(page.locator(".portrait-fallback")).toHaveAttribute(
+    "src",
+    /portrait/,
+  );
   await expect(canvas).toBeVisible();
   await expect
     .poll(async () => {
@@ -30,8 +36,28 @@ test("3D scene renders, moves, switches mode and remains readable on mobile", as
   const firstFrame = await canvasPixels(canvas);
   await page.mouse.move(1100, 310);
   await expect
+    .poll(() =>
+      page
+        .locator("#main")
+        .evaluate((element) =>
+          parseFloat(element.style.getPropertyValue("--ambient-x")),
+        ),
+    )
+    .toBeGreaterThan(1);
+  await expect
     .poll(async () => Buffer.compare(firstFrame, await canvasPixels(canvas)))
     .not.toBe(0);
+  await page.evaluate(() => window.scrollTo(0, 160));
+  await expect
+    .poll(() =>
+      page
+        .locator("#main")
+        .evaluate((element) =>
+          parseFloat(element.style.getPropertyValue("--ambient-scroll")),
+        ),
+    )
+    .toBeGreaterThan(1);
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page
     .getByRole("button", { name: "Pause animation", exact: true })
     .click();
@@ -39,7 +65,7 @@ test("3D scene renders, moves, switches mode and remains readable on mobile", as
   await page.screenshot({ path: ".data/screenshots/desktop.png" });
   await sharp(await canvasPixels(canvas))
     .webp({ quality: 88 })
-    .toFile("public/media/hero/poster.webp");
+    .toFile(".data/screenshots/portrait-frame.webp");
   await page.getByRole("button", { name: "Wireframe", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Wireframe", exact: true }),
@@ -88,6 +114,35 @@ test("3D scene renders, moves, switches mode and remains readable on mobile", as
   await expect(page.locator(".scene-poster")).toBeVisible();
 });
 
+test("project logos animate and respect the global pause control", async ({
+  page,
+}) => {
+  await page.goto("/projects");
+  const artwork = page.locator(".project-logo-art").first();
+  await artwork.scrollIntoViewIfNeeded();
+  const firstTransform = await artwork.evaluate(
+    (element) => getComputedStyle(element).transform,
+  );
+  await expect
+    .poll(() =>
+      artwork.evaluate((element) => getComputedStyle(element).transform),
+    )
+    .not.toBe(firstTransform);
+  await page
+    .getByRole("button", { name: "Pause background effects", exact: true })
+    .click();
+  await artwork.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() =>
+      artwork.evaluate((element) => getComputedStyle(element).transform),
+    )
+    .toBe("none");
+  await page.mouse.move(300, 500);
+  const background = await page.locator("#main").getAttribute("style");
+  await page.mouse.move(1000, 400);
+  expect(await page.locator("#main").getAttribute("style")).toBe(background);
+});
+
 test("project collection, exact live URLs, filters and media work", async ({
   page,
 }) => {
@@ -96,7 +151,11 @@ test("project collection, exact live URLs, filters and media work", async ({
   await expect(page.locator(".project-card")).toHaveCount(7);
   for (const project of featuredProjects)
     await expect(page.locator(`a[href="${project.liveUrl}"]`)).toBeVisible();
-  for (const image of await page.locator(".project-image").all()) {
+  await expect(page.locator(".project-logo-image")).toHaveCount(7);
+  await expect(
+    page.locator(".project-card video, .project-card .project-image"),
+  ).toHaveCount(0);
+  for (const image of await page.locator(".project-logo-image").all()) {
     await image.scrollIntoViewIfNeeded();
     await expect
       .poll(() =>
@@ -104,6 +163,10 @@ test("project collection, exact live URLs, filters and media work", async ({
       )
       .toBeGreaterThan(0);
   }
+  await page.screenshot({
+    path: ".data/screenshots/logo-listing.png",
+    fullPage: true,
+  });
   await page.getByRole("link", { name: "Games (4)", exact: true }).click();
   await expect(page.locator(".project-card")).toHaveCount(4);
   await page.goBack();
@@ -111,6 +174,7 @@ test("project collection, exact live URLs, filters and media work", async ({
   for (const project of featuredProjects) {
     await page.goto(`/projects/${project.slug}`);
     await expect(page.locator("h1")).toContainText(project.title);
+    await expect(page.locator(".detail-cover .project-image")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Visit live project" }),
     ).toHaveAttribute("href", project.liveUrl);

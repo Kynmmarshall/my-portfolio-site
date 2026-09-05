@@ -24,6 +24,8 @@ test("projects have unique routes and HTTPS actions", () => {
     assert.equal(new URL(project.liveUrl).protocol, "https:");
     assert.ok(project.evidence.length > 0);
     assert.ok(project.gallery.includes(project.cover));
+    assert.ok(project.logo.endsWith("/logo.webp"));
+    assert.notEqual(project.logo, project.cover);
   }
   assert.equal(getProject("does-not-exist"), undefined);
 });

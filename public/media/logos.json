@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "batchit",
+    "source": "https://batchit.duckdns.org/images/logo.png",
+    "local": "/media/projects/batchit/logo.webp",
+    "width": 640,
+    "height": 631,
+    "bytes": 122956,
+    "sha256": "8dec04c859f9fd98696a38df4ca5665ba843514e223a05f0559b9b6697be80f5",
+    "importedAt": "2026-09-05T10:40:03.985Z"
+  },
+  {
+    "slug": "fruit-collector",
+    "source": "https://fruitcollector.duckdns.org/assets/logo.png",
+    "local": "/media/projects/fruit-collector/logo.webp",
+    "width": 621,
+    "height": 640,
+    "bytes": 152894,
+    "sha256": "d7fd0b38fec44f88fc9b1f62bed105c186596cbf3739db9c513b45e87a724595",
+    "importedAt": "2026-09-05T10:40:19.564Z"
+  },
+  {
+    "slug": "pick-my-dish",
+    "source": "https://raw.githubusercontent.com/Kynmmarshall/Pick-My-Dish/main/website/images/logo.png",
+    "local": "/media/projects/pick-my-dish/logo.webp",
+    "width": 155,
+    "height": 152,
+    "bytes": 11298,
+    "sha256": "f97f25bf90d53f580d065ceaf6a3ad1bdbca1b725f48fdf7b67b20478bb061c5",
+    "importedAt": "2026-09-05T10:40:27.107Z"
+  },
+  {
+    "slug": "trip-io",
+    "source": "https://trip-io.duckdns.org/assets/logo.png",
+    "local": "/media/projects/trip-io/logo.webp",
+    "width": 640,
+    "height": 442,
+    "bytes": 92960,
+    "sha256": "8a910c04851a70d14fd5524ab9f14cf02a7fa716928b6e28006c2ada3691b551",
+    "importedAt": "2026-09-05T10:40:36.198Z"
+  },
+  {
+    "slug": "grid-survival",
+    "source": "https://raw.githubusercontent.com/Kynmmarshall/GridSurvivalWebsite/main/assets/logo.png",
+    "local": "/media/projects/grid-survival/logo.webp",
+    "width": 640,
+    "height": 537,
+    "bytes": 133396,
+    "sha256": "22ef4f5ce52d0874835cd8b71bd78424bdbe55e9dde55de08b1aca4b7d3b6c02",
+    "importedAt": "2026-09-05T10:40:48.215Z"
+  },
+  {
+    "slug": "math-runner",
+    "source": "https://raw.githubusercontent.com/Kynmmarshall/MATH-RUNNER/main/Assets/Menu/Title.png",
+    "local": "/media/projects/math-runner/logo.webp",
+    "width": 505,
+    "height": 74,
+    "bytes": 19602,
+    "sha256": "50d59c772e2dd144f07d5709b9a46c802ccb4c5941f7b4039a0722ea5890950a",
+    "importedAt": "2026-09-05T10:40:50.702Z"
+  },
+  {
+    "slug": "plane-game",
+    "source": "https://img.itch.zone/aW1nLzIzMTA4ODMzLnBuZw==/original/ZfzU3r.png",
+    "local": "/media/projects/plane-game/logo.webp",
+    "width": 136,
+    "height": 221,
+    "bytes": 4290,
+    "sha256": "bdbb8d187535b8443759439508395e70e6140e22988948ef7f2ae8f2fab7b2a9",
+    "importedAt": "2026-09-05T10:40:58.491Z"
+  }
+]

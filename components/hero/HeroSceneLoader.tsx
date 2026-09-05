@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Box, Grid3X3, Pause, Play } from "lucide-react";
+import { ScanFace, Grid3X3, Pause, Play } from "lucide-react";
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 
-const Scene = dynamic(() => import("@/components/three/ArchitecturalScene"), {
+const Scene = dynamic(() => import("@/components/three/PortraitScene"), {
   ssr: false,
 });
 class SceneBoundary extends Component<
@@ -49,12 +49,12 @@ export function HeroSceneLoader() {
   return (
     <div className="hero-scene" ref={root} aria-hidden="true">
       <Image
-        src="/media/hero/poster.webp"
+        src="/media/profile/portrait.webp"
         alt=""
         fill
         priority
-        sizes="100vw"
-        className="scene-poster"
+        sizes="(max-width: 640px) 90vw, 38vw"
+        className="scene-poster portrait-fallback"
       />
       {enabled && (
         <SceneBoundary>
@@ -74,7 +74,7 @@ export function SceneControls() {
           aria-pressed={mode === "artistic"}
           onClick={() => setMode("artistic")}
         >
-          <Box size={13} /> Artistic
+          <ScanFace size={13} /> Artistic
         </button>
         <button
           aria-pressed={mode === "wireframe"}

@@ -1,6 +1,6 @@
 # Kynmmarshall Portfolio
 
-Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a React Three Fiber scene, project case studies, locally optimized media, GitHub insights, and timestamped service reachability.
+Next.js App Router, React, TypeScript, and Tailwind CSS. An editorial portfolio with a layered portrait hero, mouse/scroll-reactive backgrounds, animated project logos, case studies, locally optimized media, GitHub insights, and timestamped service reachability.
 
 ## Run Locally
 
@@ -39,9 +39,11 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_URL` selects another origin. They cover canvas pixels, motion, responsive overflow, route status, links, media, gallery focus, and accessibility. Tests capture screenshots under `.data/screenshots/` and generate the real 3D fallback poster.
+Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_URL` selects another origin. They cover portrait canvas pixels, mouse/scroll response, logo motion and pause, responsive overflow, route status, links, detail media, gallery focus, and accessibility. Tests capture screenshots and the raw portrait frame under `.data/screenshots/`. The hero falls back to the original portrait if WebGL is unavailable.
 
 `npm run assets:prepare` downloads the source-attributed media inventory, creates WebP images and short MP4 previews, and captures Trip-io. Existing optimized assets are already included. FFmpeg and Playwright are development-only dependencies.
+
+`npm run assets:logos` imports the seven project branding assets listed in `content/logos.ts`. Listings show these logos only; screenshots and gameplay are kept on project detail pages. The header pause control stops logo, portrait, and ambient background motion across the site. OS reduced-motion preferences are respected.
 
 ## Main Boundaries
 

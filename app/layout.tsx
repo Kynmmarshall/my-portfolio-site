@@ -6,6 +6,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { VisualPreferencesProvider } from "@/context/VisualPreferencesContext";
+import { ReactiveBackground } from "@/components/motion/ReactiveBackground";
 
 export const metadata: Metadata = {
   title: {
@@ -38,7 +39,10 @@ export default function RootLayout({
             Skip to content
           </a>
           <SiteHeader />
-          <main id="main">{children}</main>
+          <main id="main">
+            <ReactiveBackground />
+            {children}
+          </main>
           <SiteFooter />
         </VisualPreferencesProvider>
       </body>

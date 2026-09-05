@@ -353,6 +353,7 @@ svg {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none;
 }
 .hero-scene canvas {
   touch-action: pan-y;
@@ -363,6 +364,30 @@ svg {
   object-fit: cover;
   width: 100%;
   height: 100%;
+}
+.portrait-fallback {
+  object-fit: contain;
+  object-position: center;
+  width: 38% !important;
+  max-width: 540px;
+  height: 80% !important;
+  left: 75.5% !important;
+  right: auto !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) translateY(-18px);
+}
+.hero-scene:has(canvas) .portrait-fallback {
+  visibility: hidden;
+}
+@media (max-width: 640px) {
+  .portrait-fallback {
+    width: 82% !important;
+    height: 74% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) translateY(-23px);
+    object-position: center !important;
+  }
 }
 .hero-coordinate {
   position: absolute;
@@ -398,6 +423,55 @@ svg {
 }
 .section {
   padding-block: 92px;
+}
+.section,
+.expertise-section,
+.contact-section,
+.page-heading {
+  position: relative;
+  isolation: isolate;
+}
+.section::before,
+.expertise-section::before,
+.contact-section::before,
+.page-heading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 94px,
+      #47766116 94px 95px,
+      transparent 95px 145px
+    ),
+    repeating-linear-gradient(
+      25deg,
+      transparent 0 170px,
+      #b1775514 170px 171px,
+      transparent 171px 240px
+    );
+  background-position:
+    calc(var(--ambient-x, 0px) + var(--ambient-scroll, 0px))
+      var(--ambient-y, 0px),
+    calc(var(--ambient-x, 0px) * -1) calc(var(--ambient-scroll, 0px) * -1);
+  mask-image: linear-gradient(110deg, transparent 35%, #000 100%);
+}
+#main[data-background-mode="wireframe"] .section::before {
+  opacity: 0.8;
+}
+.effects-toggle {
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .effects-toggle {
+    margin-left: auto;
+  }
+  .header-inner {
+    gap: 10px;
+  }
 }
 .section-heading {
   display: flex;
@@ -440,6 +514,80 @@ svg {
 }
 .project-card {
   min-width: 0;
+}
+.project-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.48;
+  overflow: hidden;
+  border-radius: 5px;
+  isolation: isolate;
+  border: 1px solid #2037280c;
+}
+.project-logo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(#546d4910 1px, transparent 1px),
+    linear-gradient(90deg, #546d4910 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(135deg, #000, transparent 65%);
+  transition: transform 0.7s ease;
+}
+.project-logo:hover::before,
+.project-logo:focus-visible::before {
+  transform: translate(9px, -9px);
+}
+.project-logo-art {
+  position: relative;
+  width: 44%;
+  max-width: 240px;
+  aspect-ratio: 1;
+  z-index: 1;
+}
+.project-logo[data-project="math-runner"] .project-logo-art {
+  width: 70%;
+  max-width: 360px;
+}
+.project-logo-image {
+  object-fit: contain;
+  filter: drop-shadow(0 16px 16px #20372820);
+}
+.logo-index {
+  position: absolute;
+  top: 19px;
+  left: 22px;
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  color: #52614b;
+}
+.logo-shadow {
+  position: absolute;
+  width: 33%;
+  height: 12px;
+  bottom: 17%;
+  border-radius: 50%;
+  background: #223e2915;
+  filter: blur(10px);
+}
+.logo-open {
+  position: absolute;
+  right: 20px;
+  bottom: 19px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #546d4940;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.project-logo:hover .logo-open,
+.project-logo:focus-visible .logo-open {
+  background: #ffffff9c;
 }
 .project-media {
   position: relative;

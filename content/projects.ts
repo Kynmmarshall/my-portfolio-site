@@ -9,6 +9,7 @@ export type Project = {
   liveUrl: string;
   sourceUrl?: string;
   color: string;
+  logo: string;
   cover: string;
   gallery: string[];
   video?: string;
@@ -32,6 +33,7 @@ export const projects: Project[] = [
     liveUrl: "https://batchit.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/BatchIt",
     color: "mint",
+    logo: "/media/projects/batchit/logo.webp",
     cover: "/media/projects/batchit/screen-10.webp",
     portrait: true,
     gallery: [
@@ -72,6 +74,7 @@ export const projects: Project[] = [
     liveUrl: "https://fruitcollector.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/MobileGame",
     color: "lilac",
+    logo: "/media/projects/fruit-collector/logo.webp",
     cover: "/media/projects/fruit-collector/cover.webp",
     gallery: [
       "/media/projects/fruit-collector/cover.webp",
@@ -112,6 +115,7 @@ export const projects: Project[] = [
     liveUrl: "https://pickmydish.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/Pick-My-Dish",
     color: "peach",
+    logo: "/media/projects/pick-my-dish/logo.webp",
     cover: "/media/projects/pick-my-dish/cover.webp",
     portrait: true,
     gallery: [
@@ -151,6 +155,7 @@ export const projects: Project[] = [
     stack: ["Cross-platform", "Itineraries", "Localisation"],
     liveUrl: "https://trip-io.duckdns.org",
     color: "blue",
+    logo: "/media/projects/trip-io/logo.webp",
     cover: "/media/projects/trip-io/cover.webp",
     gallery: ["/media/projects/trip-io/cover.webp"],
     featured: true,
@@ -180,6 +185,7 @@ export const projects: Project[] = [
     liveUrl: "https://grid-survival.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/Grid_Survival",
     color: "yellow",
+    logo: "/media/projects/grid-survival/logo.webp",
     cover: "/media/projects/grid-survival/cover.webp",
     gallery: ["/media/projects/grid-survival/cover.webp"],
     video: "/media/projects/grid-survival/preview.mp4",
@@ -212,6 +218,7 @@ export const projects: Project[] = [
     liveUrl: "https://kynmarshall.itch.io/math-runner",
     sourceUrl: "https://github.com/Kynmmarshall/MATH-RUNNER",
     color: "blue",
+    logo: "/media/projects/math-runner/logo.webp",
     cover: "/media/projects/math-runner/cover.webp",
     gallery: ["/media/projects/math-runner/cover.webp"],
     video: "/media/projects/math-runner/preview.mp4",
@@ -243,6 +250,7 @@ export const projects: Project[] = [
     liveUrl: "https://kynmarshall.itch.io/kynm-plane-game",
     sourceUrl: "https://github.com/Kynmmarshall/PlaneGame",
     color: "peach",
+    logo: "/media/projects/plane-game/logo.webp",
     cover: "/media/projects/plane-game/cover.webp",
     gallery: ["/media/projects/plane-game/cover.webp"],
     video: "/media/projects/plane-game/preview.mp4",

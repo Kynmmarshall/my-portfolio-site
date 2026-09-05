@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "data:github": "node --env-file-if-exists=.env.local --import tsx jobs/refresh-github.ts",
     "data:status": "node --env-file-if-exists=.env.local --import tsx jobs/check-services.ts",
-    "assets:prepare": "tsx jobs/prepare-assets.ts"
+    "assets:prepare": "tsx jobs/prepare-assets.ts",
+    "assets:logos": "tsx jobs/prepare-logos.ts"
   },
   "engines": {
     "node": ">=24.0.0 <25"

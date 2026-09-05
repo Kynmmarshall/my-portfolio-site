@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight, ArrowRight, Code2 } from "lucide-react";
 import type { Project } from "@/content/projects";
-import { ProjectMedia } from "./ProjectMedia";
+import { ProjectLogo } from "./ProjectLogo";
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
     <article className="project-card">
-      <ProjectMedia
+      <ProjectLogo
         title={project.title}
-        cover={project.cover}
-        video={project.video}
-        portrait={project.portrait}
+        slug={project.slug}
+        logo={project.logo}
         color={project.color}
       />
       <div className="project-card-body">

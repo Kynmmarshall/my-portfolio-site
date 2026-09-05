@@ -24,4 +24,14 @@ Imported assets include 13 numbered BatchIt screens; genuine Pick My Dish recipe
 
 The Pick My Dish README's placeholder screenshot was excluded. Actual screenshots came from its `website/images` directory. Team member portraits were not imported. Game sprites and underlying map/photo assets retain their original creators' rights: the portfolio presents screenshots of the developer's work, not a claim to have authored every depicted asset. Fruit Collector's credits screen is included in the asset inventory. Confirm any broader redistribution permissions before repurposing isolated third-party assets.
 
-The hero is original procedural Three.js geometry. Its fallback poster is rendered from the actual canvas during browser validation. No reference-site graphics, code, or copy were reused. The site's original static files remain preserved.
+The hero uses the existing transparent portrait, with layered Three.js planes and procedural contour lines behind it. The original portrait is also the no-WebGL fallback. Browser tests capture the raw framebuffer separately, without baking overlaid HTML into an image. No reference-site graphics, code, or copy were reused. The site's original static files remain preserved.
+
+## Project Logos
+
+The listing artwork is separate from detail media. `content/logos.ts` records seven observed branding sources; `npm run assets:logos` creates optimized local WebP versions and `public/media/logos.json` records source URLs, dimensions, hashes, and import times. Screenshots and gameplay are not used on listing cards.
+
+- BatchIt, Fruit Collector, and Trip-io: logo files published on their public project websites.
+- Pick My Dish: the project's `website/images/logo.png` repository asset.
+- Grid Survival: `GridSurvivalWebsite/assets/logo.png`.
+- Math Runner: the original `MATH-RUNNER/Assets/Menu/Title.png` title artwork.
+- Plane Game: the developer's published itch.io header branding (the original plane mark), not a fabricated replacement.

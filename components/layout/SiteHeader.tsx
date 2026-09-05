@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, Pause, Play } from "lucide-react";
+import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 
 const links = [
   { href: "/projects", label: "Work" },
@@ -15,6 +16,7 @@ const links = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { paused, setPaused, reducedMotion } = useVisualPreferences();
   return (
     <header className="site-header">
       <div className="shell header-inner">
@@ -45,6 +47,27 @@ export function SiteHeader() {
         <Link href="/#contact" className="header-contact">
           Let&apos;s talk <ArrowUpRight size={16} />
         </Link>
+        <button
+          className="icon-button effects-toggle"
+          disabled={reducedMotion}
+          onClick={() => setPaused(!paused)}
+          aria-label={
+            reducedMotion
+              ? "Background effects respect reduced motion"
+              : paused
+                ? "Resume background effects"
+                : "Pause background effects"
+          }
+          title={
+            reducedMotion
+              ? "Reduced motion enabled"
+              : paused
+                ? "Resume background effects"
+                : "Pause background effects"
+          }
+        >
+          {paused || reducedMotion ? <Play size={14} /> : <Pause size={14} />}
+        </button>
         <button
           className="icon-button mobile-toggle"
           aria-label={open ? "Close navigation" : "Open navigation"}

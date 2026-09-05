@@ -15,9 +15,10 @@ RootLayout
   VisualPreferencesProvider
   SiteHeader
   Main
+    ReactiveBackground
     HomePage
-      HeroSection -> HeroSceneLoader -> ArchitecturalScene
-      ProjectGrid -> ProjectCard -> ProjectMedia
+      HeroSection -> HeroSceneLoader -> PortraitScene
+      ProjectGrid -> ProjectCard -> ProjectLogo
       SkillArchitecture
       InsightsPreview -> LanguageBreakdown
       About -> ContactSection
@@ -31,13 +32,14 @@ RootLayout
 
 ## Animation Ownership
 
-- React Three Fiber/Three.js owns a single hero canvas and imperative per-frame geometry changes.
+- React Three Fiber/Three.js owns the hero's textured portrait planes and procedural contour background. The actual transparent portrait is preserved, with shallow parallax and subtle depth shadows rather than an invented face mesh. A Suspense boundary inside the canvas contains texture loading and prevents WebGL context disposal during initialization.
 - GSAP owns a scoped hero scroll-progress ref. It cleans up ScrollTrigger on preference/visibility changes and does not animate React-owned DOM transforms.
-- Framer Motion owns one-time section reveals. Content never starts hidden, preserving no-JavaScript access.
-- CSS owns ordinary hover/focus transitions. Reduced motion disables choreography; the canvas can render on demand, pauses offscreen/in hidden tabs, and falls back to a local rendered poster after context loss.
-- Artistic/wireframe changes materials in the existing canvas. No duplicate WebGL context is created for a mode switch. Browser storage failure falls back to session memory.
+- Framer Motion owns one-time section reveals and in-view logo float animation. Content never starts hidden, preserving no-JavaScript access. Project listing cards render only logos, with screenshots and gameplay isolated to detail pages.
+- ReactiveBackground updates CSS background-position variables from mouse and scroll input using a settling animation-frame loop, without React renders on every frame. Content positions and native scrolling are unchanged. Listeners are cleaned up on route, visibility, and preference changes.
+- CSS owns ordinary hover/focus transitions. Reduced motion disables choreography; the canvas can render on demand, pauses offscreen/in hidden tabs, and falls back to the original portrait after context loss. A header control pauses all visual effects from any page.
+- Artistic/wireframe changes contour emphasis in the existing canvas, not the portrait itself. No duplicate WebGL context is created for a mode switch. Browser storage failure falls back to session memory.
 
-The scene has no external HDR/model requests. Locally constructed geometry, lights, and environment reflection produce the visual. No camera, microphone, or geolocation access is requested.
+The scene has no external HDR/model requests. A local portrait texture and lightweight contour shader produce the visual. No camera, microphone, or geolocation access is requested.
 
 ## Content and Data
 
