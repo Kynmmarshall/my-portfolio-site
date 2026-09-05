@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+main() {
 set -Eeuo pipefail
 umask 077
 
@@ -23,7 +24,8 @@ export PATH="$(dirname "$NODE_BIN"):$PATH"
 command -v npm >/dev/null || fail "npm is unavailable alongside Node 24."
 
 REPO_DIR="$(cd "$REPO_DIR" && pwd -P)"
-[[ "$(git -C "$REPO_DIR" rev-parse --show-toplevel)" == "$REPO_DIR" ]] || fail "REPO_DIR must be the Git repository root."
+git_root="$(git -C "$REPO_DIR" rev-parse --show-toplevel)"
+[[ "$(cd "$git_root" && pwd -P)" == "$REPO_DIR" ]] || fail "REPO_DIR must be the Git repository root."
 mkdir -p "$DEPLOY_DIR/releases"
 DEPLOY_DIR="$(cd "$DEPLOY_DIR" && pwd -P)"
 case "$DEPLOY_DIR/" in "$REPO_DIR/"*) fail "DEPLOY_DIR must be outside the Git checkout." ;; esac
@@ -145,3 +147,6 @@ pm2_command save
 switching=0
 log "Deployed $commit at $SITE_URL (local health check passed)."
 log "NGINX/DNS/certificates were not changed. Releases remain under $DEPLOY_DIR/releases; monitor disk usage."
+}
+
+main "$@"
