@@ -32,6 +32,12 @@ export function HeroSceneLoader() {
       navigator as Navigator & { connection?: { saveData?: boolean } }
     ).connection;
     if (connection?.saveData) return;
+    const memory = (navigator as Navigator & { deviceMemory?: number })
+      .deviceMemory;
+    const limitedDevice =
+      navigator.hardwareConcurrency <= 4 ||
+      (memory !== undefined && memory <= 4);
+    if (limitedDevice && window.matchMedia("(pointer: coarse)").matches) return;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("webgl2");
     if (!context) return;

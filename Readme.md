@@ -8,7 +8,7 @@ The top navigation includes Profile, linking to `/resume`. This is a styled engi
 
 Fruit Collector links to its verified Google Play listing (`com.kynmmarshall.fruitcollector`) from project cards and its detail page. The public Google Play developer account is included in social links and the profile. No download counts, ratings, or additional store accounts are inferred.
 
-The continuous wireframe terrain is rendered strictly behind content. GPU vertex displacement, a single mesh, capped pixel ratio, 24/30 FPS render targets, debounced resizing, and pause/visibility handling bound its cost. Shader-based depth softening approximates defocus without a fullscreen postprocessing pass. Optional device tilt requires an explicit action on supported secure mobile browsers. This is optimized for low overhead, not a guarantee of zero lag on every device.
+The continuous wireframe terrain is rendered strictly behind content and targets 60 FPS with drift-free scheduling. Mobile/low-capability devices start with 1,271 vertices and at most 180,000 drawing-buffer pixels, a simpler shader, and no retained framebuffer, depth buffer, or stencil buffer. Sustained slow frames reduce quality to 475 vertices/90,000 pixels; persistent pressure freezes the surface rather than fighting the browser. Quality never ramps back up during the same mount. Reduced motion, pause, hidden tabs, and offscreen state stop the loop. Low-capability touch devices keep the portrait image instead of running a second WebGL canvas. Optional device tilt remains opt-in. Real-device GPU speed, battery state, and thermal limits vary, so flawless 60 FPS or no overheating cannot be guaranteed.
 
 ## Run Locally
 
@@ -50,6 +50,8 @@ npm run test:e2e
 ```
 
 Browser tests require a running site at http://127.0.0.1:3000; `PLAYWRIGHT_BASE_URL` selects another origin. They cover portrait canvas pixels, mouse/scroll response, logo motion and pause, responsive overflow, route status, links, detail media, gallery focus, and accessibility. Tests capture screenshots and the raw portrait frame under `.data/screenshots/`. The hero falls back to the original portrait if WebGL is unavailable.
+
+Terrain visual tests enable framebuffer retention only through test instrumentation for deterministic pixel capture; performance tests exercise the normal production setting with retention disabled. A separate mobile benchmark uses 4x Chromium CPU throttling, a DPR-3 viewport, and low-capability hints. Its short-run measurements are not a physical-phone GPU, battery, or thermal certification.
 
 `npm run assets:prepare` downloads the source-attributed media inventory, creates WebP images and short MP4 previews, and captures Trip-io. Existing optimized assets are already included. FFmpeg and Playwright are development-only dependencies.
 

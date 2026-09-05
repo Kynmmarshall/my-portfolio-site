@@ -40,11 +40,26 @@ RootLayout
 - CSS owns ordinary hover/focus transitions. Reduced motion disables choreography; the canvas can render on demand, pauses offscreen/in hidden tabs, and falls back to the original portrait after context loss. A header control pauses all visual effects from any page.
 - The hero no longer exposes the Artistic/Wireframe selector. Portrait/background rendering and the motion-pause controls remain intact; existing internal appearance preference support is retained.
 
-The scene has no external HDR/model requests. A local portrait texture and procedural terrain produce the visual. The terrain uses 5,525 vertices, 10,752 triangles, one draw call, an expanded bounding sphere for shader displacement, and frustum culling. Pixel ratio caps are 1 on mobile and 1.5 on desktop; render targets are 24 and 30 FPS respectively. ResizeObserver updates are debounced at 120ms, and all GPU resources/listeners are disposed on unmount. Depth-dependent line widening and a restrained halo approximate defocus without expensive postprocessing. No discrete bokeh sprites are used.
+The scene has no external HDR/model requests. A local portrait texture and procedural terrain produce the visual. Terrain rendering targets 60 Hz, schedules at most one draw per browser frame, and carries deadline remainder forward instead of dropping frames due to timer rounding. Geometry and resolution change only on quality transitions/resizes, never per animation frame. Camera matrices are updated only while input is settling.
+
+Performance policy lives in `lib/visuals/terrain-performance.ts`:
+
+| Quality                   | Vertices | Triangles | Pixel ceiling | Pixel-ratio ceiling |
+| ------------------------- | -------- | --------- | ------------- | ------------------- |
+| Desktop                   | 3,185    | 6,144     | 800,000       | 1                   |
+| Mobile / lower capability | 1,271    | 2,400     | 180,000       | 0.75                |
+| Minimal                   | 475      | 864       | 90,000        | 0.75                |
+| Static protection         | 475      | 864       | 90,000        | 0.75                |
+
+Small screens, coarse pointers, <=4 logical cores, or <=4GB reported device memory select the conservative initial tier. Device hints are heuristics, not a reliable hardware benchmark. Two consecutive 2.5-second windows of persistent missed/slow frames lower quality; continued pressure freezes the last surface. Quality never increases again during the mount, avoiding oscillation or repeatedly loading a struggling GPU. Pause/resume resets pressure history. A smaller viewport also lowers the budget; a larger viewport never silently restores higher quality.
+
+The one terrain draw uses no depth/stencil buffer, no antialiasing, and `preserveDrawingBuffer: false`. The low-power shader removes the halo calculation; the desktop halo uses smoothstep instead of per-fragment exp/pow. Derivative-based line softening still suggests depth without expensive full-screen postprocessing. An expanded bounding sphere includes shader displacement and preserves frustum culling. ResizeObserver updates are debounced at 120ms. Direct visibility events and IntersectionObserver suspend the animation loop, and all GPU resources/listeners are disposed on unmount. There is no continuous React state update or layout read in the frame loop.
+
+On low-capability coarse-pointer devices, HeroSceneLoader keeps the actual portrait image and does not initialize the separate portrait canvas. This reserves the single WebGL context for the requested terrain background; capable desktop devices retain interactive portrait depth. No discrete bokeh sprites or new external assets are used.
 
 DeviceTiltControl only appears on supported coarse-pointer secure contexts. It requests permission inside a deliberate click handler, calibrates relative orientation, adjusts for screen rotation, and handles denial without affecting navigation. Sensors stop driving visuals under pause, reduced motion, or hidden-page conditions. No sensor values are stored or sent. No camera, microphone, or geolocation access is requested.
 
-The terrain browser test measures draw-call frequency and WebGL submission duration in its environment. That is not an end-to-end GPU completion, input-latency, battery, or all-device benchmark; zero lag cannot be guaranteed.
+The terrain browser tests distinguish visual capture from performance: `canvas-readback.ts` opts pixel tests into framebuffer retention, while budget/CPU-throttled tests use actual production settings. Tests verify 60 Hz scheduling mathematically, pixel/vertex limits, adaptation under injected slow intervals, a single mobile WebGL canvas, hidden-tab suspension, context loss, and pointer/tilt interaction. The mobile benchmark uses 4x Chromium CPU throttling and reports a measured frame-interval distribution. This does not emulate a physical low-end GPU or measure battery/temperature; flawless 60 FPS and zero overheating cannot be guaranteed.
 
 ## Content and Data
 

@@ -3,6 +3,11 @@ import AxeBuilder from "@axe-core/playwright";
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
 import { featuredProjects } from "../../content/projects";
+import { enableCanvasReadback } from "./canvas-readback";
+
+test.beforeEach(async ({ page }) => {
+  await enableCanvasReadback(page);
+});
 
 async function canvasPixels(canvas: Locator) {
   const dataUrl = await canvas.evaluate(

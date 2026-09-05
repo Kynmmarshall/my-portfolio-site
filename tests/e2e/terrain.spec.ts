@@ -1,6 +1,11 @@
 import { test, expect, type Locator } from "@playwright/test";
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
+import { enableCanvasReadback } from "./canvas-readback";
+
+test.beforeEach(async ({ page }, info) => {
+  if (!info.title.includes("budgets")) await enableCanvasReadback(page);
+});
 
 async function pixels(canvas: Locator) {
   const data = await canvas.evaluate((element) =>
@@ -71,9 +76,15 @@ test("terrain is rendered beneath content, morphs, and pauses without blocking n
     await page.setViewportSize(viewport);
     await expect
       .poll(() =>
-        canvas.evaluate((element) => (element as HTMLCanvasElement).width),
+        canvas.evaluate((element) => {
+          const canvas = element as HTMLCanvasElement;
+          return (
+            canvas.width <= innerWidth &&
+            canvas.width * canvas.height <= 800_000
+          );
+        }),
       )
-      .toBe(viewport.width);
+      .toBe(true);
     await expect
       .poll(
         async () => (await sharp(await pixels(canvas)).stats()).channels[3].max,
@@ -240,37 +251,129 @@ test("terrain rendering stays within its frame and geometry budgets", async ({
     "true",
   );
   await nextFrames(canvas);
-  await page.evaluate(() => {
-    (window as unknown as { terrainDraws: unknown[] }).terrainDraws = [];
+  const attributes = await canvas.evaluate((element) =>
+    (element as HTMLCanvasElement).getContext("webgl2")?.getContextAttributes(),
+  );
+  expect(attributes?.preserveDrawingBuffer).toBe(false);
+  expect(attributes?.depth).toBe(false);
+  expect(attributes?.stencil).toBe(false);
+  const measurement = await page.evaluate(async () => {
+    const state = window as unknown as {
+      terrainDraws: { at: number; duration: number; count: number }[];
+    };
+    state.terrainDraws = [];
+    const start = performance.now();
+    await new Promise<void>((resolve) => {
+      const next = () => {
+        if (performance.now() - start >= 2000) resolve();
+        else requestAnimationFrame(next);
+      };
+      requestAnimationFrame(next);
+    });
+    return {
+      draws: state.terrainDraws.slice(),
+      duration: performance.now() - start,
+    };
   });
-  await canvas.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        const end = performance.now() + 2000;
-        const next = () => {
-          if (performance.now() >= end) resolve();
-          else requestAnimationFrame(next);
-        };
-        requestAnimationFrame(next);
-      }),
-  );
-  const draws = await page.evaluate(
-    () =>
-      (
-        window as unknown as {
-          terrainDraws: { at: number; duration: number; count: number }[];
-        }
-      ).terrainDraws,
-  );
+  const { draws } = measurement;
   expect(draws.length).toBeGreaterThan(0);
-  expect(draws.length).toBeLessThanOrEqual(64);
+  expect(draws.length).toBeLessThanOrEqual(
+    Math.ceil(measurement.duration / (1000 / 60)) + 2,
+  );
   expect(Math.max(...draws.map((draw) => draw.count))).toBeLessThanOrEqual(
-    84 * 64 * 6,
+    64 * 48 * 6,
   );
   const times = draws
     .map((draw) => draw.duration)
     .sort((first, second) => first - second);
   console.log(
-    `Terrain: ${draws.length} draws over 2s; p95 WebGL draw submission ${times[Math.floor(times.length * 0.95)].toFixed(2)}ms; 5,525 vertices / one draw per frame.`,
+    `Terrain: ${draws.length} draws over ${(measurement.duration / 1000).toFixed(2)}s; p95 WebGL draw submission ${times[Math.floor(times.length * 0.95)].toFixed(2)}ms; bounded adaptive geometry / one draw per frame; readback disabled.`,
   );
+});
+
+test("low-end mobile budgets use one WebGL canvas and adapt to sustained slow frames", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    baseURL,
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+  try {
+    const page = await context.newPage();
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "hardwareConcurrency", { value: 2 });
+      Object.defineProperty(navigator, "deviceMemory", { value: 2 });
+      const state = window as unknown as {
+        terrainFrameCount: number;
+        slowFrames: boolean;
+      };
+      state.terrainFrameCount = 0;
+      state.slowFrames = false;
+      const originalDraw = WebGL2RenderingContext.prototype.drawElements;
+      WebGL2RenderingContext.prototype.drawElements = function (...args) {
+        originalDraw.apply(this, args);
+        if (
+          this.canvas instanceof HTMLCanvasElement &&
+          this.canvas.closest(".terrain-background")
+        )
+          state.terrainFrameCount++;
+      };
+      const raf = window.requestAnimationFrame.bind(window);
+      let simulated = 0;
+      window.requestAnimationFrame = (callback) =>
+        raf((timestamp) => {
+          simulated = state.slowFrames
+            ? Math.max(simulated, timestamp) + 34
+            : timestamp;
+          callback(simulated);
+        });
+    });
+    await page.goto("/");
+    const host = page.locator(".terrain-background");
+    await expect(host).toHaveAttribute("data-ready", "true");
+    await expect(host).toHaveAttribute("data-quality", "1");
+    await expect(host).toHaveAttribute("data-vertices", "1271");
+    await expect(host).toHaveAttribute("data-target-fps", "60");
+    await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
+    await expect(page.locator(".portrait-fallback")).toBeVisible();
+    const canvas = host.locator("canvas");
+    const budget = await canvas.evaluate((element) => {
+      const canvas = element as HTMLCanvasElement;
+      return {
+        pixels: canvas.width * canvas.height,
+        readback: canvas.getContext("webgl2")?.getContextAttributes()
+          ?.preserveDrawingBuffer,
+      };
+    });
+    expect(budget.pixels).toBeLessThanOrEqual(180_000);
+    expect(budget.readback).toBe(false);
+    await page.evaluate(() => {
+      (window as unknown as { slowFrames: boolean }).slowFrames = true;
+    });
+    await expect(host).toHaveAttribute("data-quality", "3", { timeout: 20000 });
+    await expect(host).toHaveAttribute("data-target-fps", "0");
+    await expect(host).toHaveAttribute("data-vertices", "475");
+    const count = await page.evaluate(
+      () =>
+        (window as unknown as { terrainFrameCount: number }).terrainFrameCount,
+    );
+    await nextFrames(canvas);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { terrainFrameCount: number })
+            .terrainFrameCount,
+      ),
+    ).toBe(count);
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    await expect(
+      page.getByRole("navigation", { name: "Mobile navigation" }),
+    ).toBeVisible();
+  } finally {
+    await context.close();
+  }
 });
