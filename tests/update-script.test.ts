@@ -9,7 +9,6 @@ const bash =
 
 for (const scenario of [
   "success",
-  "dirty",
   "diverged",
   "locked",
   "install-failure",

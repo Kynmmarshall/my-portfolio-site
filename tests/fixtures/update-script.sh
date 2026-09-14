@@ -117,7 +117,6 @@ git -C "$temporary/source" commit --quiet -m update
 git -C "$temporary/source" push --quiet
 
 case "$scenario" in
-  dirty) printf 'local edits\n' > "$REPO_DIR/version.txt" ;;
   diverged)
     printf 'local commit\n' > "$REPO_DIR/version.txt"
     git -C "$REPO_DIR" commit --quiet -am local
@@ -144,7 +143,6 @@ else
         install-failure) grep -q '^npm ci ' "$TEST_EVENTS" ;;
         test-failure) grep -q '^npm test$' "$TEST_EVENTS" ;;
         build-failure) grep -q '^npm run build$' "$TEST_EVENTS" ;;
-        dirty) grep -q 'checkout has local changes' "$temporary/output" ;;
         diverged) grep -q 'ahead of or diverge' "$temporary/output" ;;
         locked) grep -q 'Another update' "$temporary/output" ;;
       esac

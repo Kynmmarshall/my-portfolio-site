@@ -40,7 +40,9 @@ health_check() {
     -H 'Host: kynmmarshall.is-a.dev' "http://127.0.0.1:$PORT/"
 }
 
-[[ -z "$(git -C "$REPO_DIR" status --porcelain)" ]] || fail "Git checkout has local changes. Back them up and reconcile them with GitHub before updating; nothing was discarded."
+# A dirty checkout is allowed. Releases are built from `git archive HEAD`, so
+# uncommitted edits are never deployed, and git still refuses a fast-forward that
+# would overwrite locally modified files.
 branch="$(git -C "$REPO_DIR" symbolic-ref --quiet --short HEAD)" || fail "Checkout is on a detached HEAD."
 remote="$(git -C "$REPO_DIR" config --get "branch.$branch.remote")" || fail "The current branch has no upstream remote."
 [[ "$remote" != . ]] || fail "A remote upstream is required."
