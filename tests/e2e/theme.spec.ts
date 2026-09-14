@@ -234,7 +234,7 @@ test("portrait icons are served as the browser and touch icons", async ({
   }
 });
 
-test("dark mode keeps portrait and terrain canvases visible and responsive", async ({
+test("dark mode keeps portrait and background canvases visible and responsive", async ({
   page,
 }) => {
   await enableCanvasReadback(page);
@@ -244,7 +244,7 @@ test("dark mode keeps portrait and terrain canvases visible and responsive", asy
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     const portrait = page.locator(".hero-scene canvas");
-    const terrain = page.locator(".terrain-background canvas");
+    const terrain = page.locator(".scene-background canvas");
     for (const canvas of [portrait, terrain]) {
       await expect(canvas).toBeVisible();
       await expect

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Maximize2, X } from "lucide-react";
+import { useSceneMotion } from "@/context/ScrollMotionProvider";
 
 export function MediaGallery({
   images,
@@ -14,9 +15,13 @@ export function MediaGallery({
 }) {
   const [active, setActive] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const controller = useSceneMotion();
   useEffect(() => {
-    if (active !== null && !dialog.current?.open) dialog.current?.showModal();
-  }, [active]);
+    if (active === null) return;
+    if (!dialog.current?.open) dialog.current?.showModal();
+    // Released on close, unmount and route change, so scrolling can never stay locked.
+    return controller.lockScroll();
+  }, [active, controller]);
   function close() {
     dialog.current?.close();
   }
@@ -45,6 +50,7 @@ export function MediaGallery({
         ref={dialog}
         className="media-dialog"
         aria-label={`${title} screenshot gallery`}
+        data-lenis-prevent
         onClose={() => setActive(null)}
         onClick={(event) => {
           if (event.target === dialog.current) close();

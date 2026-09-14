@@ -40,7 +40,7 @@ export default async function ProjectPage({
   const next = projects[(projects.indexOf(project) + 1) % projects.length];
   return (
     <>
-      <article className="shell">
+      <article className="shell" data-scene="detail">
         <header className="detail-header">
           <Link href="/projects" className="text-link">
             <ArrowLeft size={14} /> All projects

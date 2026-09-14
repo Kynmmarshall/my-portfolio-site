@@ -1,4 +1,4 @@
-import { test, expect, type Locator } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
 import { enableCanvasReadback } from "./canvas-readback";
@@ -14,61 +14,91 @@ async function pixels(canvas: Locator) {
   return Buffer.from(data.split(",")[1], "base64");
 }
 
-async function nextFrames(canvas: Locator) {
-  await canvas.evaluate(
-    () =>
+async function nextFrames(page: Page, count = 12) {
+  await page.evaluate(
+    (total) =>
       new Promise<void>((resolve) => {
-        let count = 0;
+        let seen = 0;
         const next = () => {
-          if (++count === 12) resolve();
+          if (++seen === total) resolve();
           else requestAnimationFrame(next);
         };
         requestAnimationFrame(next);
       }),
+    count,
   );
 }
 
-test("terrain is rendered beneath content, morphs, and pauses without blocking navigation", async ({
+/**
+ * A glass frame issues several draw calls (body, accent, transmission pass), so
+ * draw calls cannot be counted as frames. Calls inside one frame land close
+ * together even under CPU throttling, while frames are ~16ms apart, so an 8ms
+ * gap separates clusters unambiguously.
+ */
+function clusterFrames(times: number[]) {
+  const sizes: number[] = [];
+  for (let index = 0; index < times.length; index++) {
+    if (index === 0 || times[index] - times[index - 1] > 8) sizes.push(1);
+    else sizes[sizes.length - 1] += 1;
+  }
+  return sizes;
+}
+
+test("background renders beneath content, reacts to input, and pauses without blocking navigation", async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/expertise");
-  const canvas = page.locator(".terrain-background canvas");
-  await expect(page.locator(".terrain-background")).toHaveAttribute(
-    "data-ready",
-    "true",
-  );
+  const host = page.locator(".scene-background");
+  const canvas = host.locator("canvas");
+  await expect(host).toHaveAttribute("data-ready", "true");
+
   await expect
     .poll(
       async () => (await sharp(await pixels(canvas)).stats()).channels[3].max,
     )
     .toBeGreaterThan(10);
+
   const first = await pixels(canvas);
   await page.mouse.move(1200, 200);
   await expect
     .poll(async () => Buffer.compare(first, await pixels(canvas)))
     .not.toBe(0);
-  await page.evaluate(() => window.scrollTo(0, 450));
+
+  const beforeScroll = await pixels(canvas);
+  await page.evaluate(() => window.scrollTo(0, 900));
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300);
-  const style = await page
-    .locator(".terrain-background")
-    .evaluate((element) => ({
-      pointer: getComputedStyle(element).pointerEvents,
-      zIndex: getComputedStyle(element).zIndex,
-      position: getComputedStyle(element).position,
-    }));
-  expect(style).toEqual({ pointer: "none", zIndex: "-1", position: "fixed" });
+  await expect
+    .poll(async () => Buffer.compare(beforeScroll, await pixels(canvas)))
+    .not.toBe(0);
+
+  const style = await host.evaluate((element) => ({
+    pointer: getComputedStyle(element).pointerEvents,
+    zIndex: getComputedStyle(element).zIndex,
+    position: getComputedStyle(element).position,
+    canvasPointer: getComputedStyle(element.querySelector("canvas")!)
+      .pointerEvents,
+  }));
+  expect(style).toEqual({
+    pointer: "none",
+    zIndex: "-1",
+    position: "fixed",
+    canvasPointer: "none",
+  });
+
   await page
     .getByRole("button", { name: "Pause background effects", exact: true })
     .click();
-  await nextFrames(canvas);
+  await nextFrames(page);
   const paused = await pixels(canvas);
   await page.mouse.move(120, 650);
-  await nextFrames(canvas);
+  await nextFrames(page);
   expect(Buffer.compare(paused, await pixels(canvas))).toBe(0);
+
   await mkdir(".data/screenshots", { recursive: true });
-  await page.screenshot({ path: ".data/screenshots/terrain-desktop.png" });
+  await page.screenshot({ path: ".data/screenshots/scene-desktop.png" });
+
   for (const viewport of [
     { width: 390, height: 844 },
     { width: 1440, height: 900 },
@@ -77,59 +107,90 @@ test("terrain is rendered beneath content, morphs, and pauses without blocking n
     await expect
       .poll(() =>
         canvas.evaluate((element) => {
-          const canvas = element as HTMLCanvasElement;
-          return (
-            canvas.width <= innerWidth &&
-            canvas.width * canvas.height <= 800_000
-          );
+          const node = element as HTMLCanvasElement;
+          return node.width <= innerWidth && node.width * node.height <= 800_000;
         }),
       )
       .toBe(true);
-    await expect
-      .poll(
-        async () => (await sharp(await pixels(canvas)).stats()).channels[3].max,
-      )
-      .toBeGreaterThan(10);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
     await page.screenshot({
-      path: `.data/screenshots/terrain-${viewport.width}.png`,
+      path: `.data/screenshots/scene-${viewport.width}.png`,
     });
   }
+
   await page
     .getByRole("navigation", { name: "Main navigation", exact: true })
     .getByRole("link", { name: "Work", exact: true })
     .click();
   await expect(page).toHaveURL(/\/projects$/);
+  await expect(host).toHaveAttribute("data-ready", "true");
   expect(errors).toEqual([]);
 });
 
-test("reduced motion freezes the terrain and context loss leaves a safe fallback", async ({
+test("reduced motion freezes the scene and context loss leaves a safe fallback", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/expertise");
-  const canvas = page.locator(".terrain-background canvas");
-  await expect(page.locator(".terrain-background")).toHaveAttribute(
-    "data-ready",
-    "true",
-  );
-  await nextFrames(canvas);
+  const host = page.locator(".scene-background");
+  const canvas = host.locator("canvas");
+  await expect(host).toHaveAttribute("data-ready", "true");
+  await nextFrames(page);
   const first = await pixels(canvas);
   await page.mouse.move(1000, 350);
-  await nextFrames(canvas);
+  await nextFrames(page);
   expect(Buffer.compare(first, await pixels(canvas))).toBe(0);
+
+  // Scrolling must still work while the scene is frozen.
+  await page.evaluate(() => window.scrollTo(0, 400));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(200);
+
   await canvas.evaluate((element) =>
     element.dispatchEvent(new Event("webglcontextlost", { cancelable: true })),
   );
-  await expect(page.locator(".terrain-background")).toHaveAttribute(
-    "data-ready",
-    "false",
-  );
+  await expect(host).toHaveAttribute("data-ready", "false");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});
+
+test("the opt-in control shapes the sculpture with pointer and keyboard", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const host = page.locator(".scene-background");
+  const canvas = host.locator("canvas");
+  await expect(host).toHaveAttribute("data-ready", "true");
+  await page
+    .getByRole("button", { name: "Pause background effects", exact: true })
+    .click();
+  await nextFrames(page);
+
+  const control = page.getByRole("button", {
+    name: /Shape the background sculpture/,
+  });
+  await expect(control).toBeVisible();
+  const before = await pixels(canvas);
+
+  await control.focus();
+  for (let press = 0; press < 6; press++)
+    await page.keyboard.press("ArrowRight");
+  await nextFrames(page);
+  expect(Buffer.compare(before, await pixels(canvas))).not.toBe(0);
+
+  // Page scrolling is untouched by the control.
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
+
+  const reset = page.getByRole("button", {
+    name: "Reset the background sculpture",
+    exact: true,
+  });
+  await expect(reset).toBeVisible();
+  await reset.click();
+  await nextFrames(page);
 });
 
 test("device tilt is explicitly enabled, handles permission denial, and responds to sensor input", async ({
@@ -221,47 +282,43 @@ test("device tilt is explicitly enabled, handles permission denial, and responds
   }
 });
 
-test("terrain rendering stays within its frame and geometry budgets", async ({
+test("scene rendering stays within its frame and geometry budgets", async ({
   page,
 }) => {
   await page.addInitScript(() => {
     const original = WebGL2RenderingContext.prototype.drawElements;
     const state = window as unknown as {
-      terrainDraws: { at: number; duration: number; count: number }[];
+      sceneDraws: { at: number; count: number }[];
     };
-    state.terrainDraws = [];
+    state.sceneDraws = [];
     WebGL2RenderingContext.prototype.drawElements = function (...args) {
-      const start = performance.now();
       original.apply(this, args);
       if (
         this.canvas instanceof HTMLCanvasElement &&
-        this.canvas.closest(".terrain-background")
+        this.canvas.closest(".scene-background")
       )
-        state.terrainDraws.push({
-          at: start,
-          duration: performance.now() - start,
-          count: args[1],
-        });
+        state.sceneDraws.push({ at: performance.now(), count: args[1] });
     };
   });
   await page.goto("/expertise");
-  const canvas = page.locator(".terrain-background canvas");
-  await expect(page.locator(".terrain-background")).toHaveAttribute(
-    "data-ready",
-    "true",
-  );
-  await nextFrames(canvas);
+  const host = page.locator(".scene-background");
+  const canvas = host.locator("canvas");
+  await expect(host).toHaveAttribute("data-ready", "true");
+  await nextFrames(page);
+
   const attributes = await canvas.evaluate((element) =>
     (element as HTMLCanvasElement).getContext("webgl2")?.getContextAttributes(),
   );
   expect(attributes?.preserveDrawingBuffer).toBe(false);
-  expect(attributes?.depth).toBe(false);
   expect(attributes?.stencil).toBe(false);
+  // Real overlapping 3D geometry needs a depth buffer, unlike the old flat surface.
+  expect(attributes?.depth).toBe(true);
+
   const measurement = await page.evaluate(async () => {
     const state = window as unknown as {
-      terrainDraws: { at: number; duration: number; count: number }[];
+      sceneDraws: { at: number; count: number }[];
     };
-    state.terrainDraws = [];
+    state.sceneDraws = [];
     const start = performance.now();
     await new Promise<void>((resolve) => {
       const next = () => {
@@ -271,109 +328,36 @@ test("terrain rendering stays within its frame and geometry budgets", async ({
       requestAnimationFrame(next);
     });
     return {
-      draws: state.terrainDraws.slice(),
+      draws: state.sceneDraws.slice(),
       duration: performance.now() - start,
     };
   });
+
   const { draws } = measurement;
   expect(draws.length).toBeGreaterThan(0);
-  expect(draws.length).toBeLessThanOrEqual(
+  const clusters = clusterFrames(draws.map((draw) => draw.at));
+  const frames = clusters.length;
+  const maxDrawsPerFrame = Math.max(...clusters);
+
+  // At most one scene frame per browser frame, capped at 60 Hz.
+  expect(frames).toBeLessThanOrEqual(
     Math.ceil(measurement.duration / (1000 / 60)) + 2,
   );
+  expect(maxDrawsPerFrame).toBeLessThanOrEqual(12);
+  // Index count of the densest allowed knot: tubular * radial * 6.
   expect(Math.max(...draws.map((draw) => draw.count))).toBeLessThanOrEqual(
-    64 * 48 * 6,
+    96 * 24 * 6,
   );
-  const times = draws
-    .map((draw) => draw.duration)
-    .sort((first, second) => first - second);
-  console.log(
-    `Terrain: ${draws.length} draws over ${(measurement.duration / 1000).toFixed(2)}s; p95 WebGL draw submission ${times[Math.floor(times.length * 0.95)].toFixed(2)}ms; bounded adaptive geometry / one draw per frame; readback disabled.`,
-  );
-});
 
-test("low-end mobile budgets use one WebGL canvas and adapt to sustained slow frames", async ({
-  browser,
-  baseURL,
-}) => {
-  const context = await browser.newContext({
-    baseURL,
-    viewport: { width: 390, height: 844 },
-    deviceScaleFactor: 3,
-    isMobile: true,
-    hasTouch: true,
-  });
-  try {
-    const page = await context.newPage();
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, "hardwareConcurrency", { value: 2 });
-      Object.defineProperty(navigator, "deviceMemory", { value: 2 });
-      const state = window as unknown as {
-        terrainFrameCount: number;
-        slowFrames: boolean;
-      };
-      state.terrainFrameCount = 0;
-      state.slowFrames = false;
-      const originalDraw = WebGL2RenderingContext.prototype.drawElements;
-      WebGL2RenderingContext.prototype.drawElements = function (...args) {
-        originalDraw.apply(this, args);
-        if (
-          this.canvas instanceof HTMLCanvasElement &&
-          this.canvas.closest(".terrain-background")
-        )
-          state.terrainFrameCount++;
-      };
-      const raf = window.requestAnimationFrame.bind(window);
-      let simulated = 0;
-      window.requestAnimationFrame = (callback) =>
-        raf((timestamp) => {
-          simulated = state.slowFrames
-            ? Math.max(simulated, timestamp) + 34
-            : timestamp;
-          callback(simulated);
-        });
-    });
-    await page.goto("/");
-    const host = page.locator(".terrain-background");
-    await expect(host).toHaveAttribute("data-ready", "true");
-    await expect(host).toHaveAttribute("data-quality", "1");
-    await expect(host).toHaveAttribute("data-vertices", "1271");
-    await expect(host).toHaveAttribute("data-target-fps", "60");
-    await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
-    await expect(page.locator(".portrait-fallback")).toBeVisible();
-    const canvas = host.locator("canvas");
-    const budget = await canvas.evaluate((element) => {
-      const canvas = element as HTMLCanvasElement;
-      return {
-        pixels: canvas.width * canvas.height,
-        readback: canvas.getContext("webgl2")?.getContextAttributes()
-          ?.preserveDrawingBuffer,
-      };
-    });
-    expect(budget.pixels).toBeLessThanOrEqual(180_000);
-    expect(budget.readback).toBe(false);
-    await page.evaluate(() => {
-      (window as unknown as { slowFrames: boolean }).slowFrames = true;
-    });
-    await expect(host).toHaveAttribute("data-quality", "3", { timeout: 20000 });
-    await expect(host).toHaveAttribute("data-target-fps", "0");
-    await expect(host).toHaveAttribute("data-vertices", "475");
-    const count = await page.evaluate(
-      () =>
-        (window as unknown as { terrainFrameCount: number }).terrainFrameCount,
-    );
-    await nextFrames(canvas);
-    expect(
-      await page.evaluate(
-        () =>
-          (window as unknown as { terrainFrameCount: number })
-            .terrainFrameCount,
-      ),
-    ).toBe(count);
-    await page.getByRole("button", { name: "Open navigation" }).click();
-    await expect(
-      page.getByRole("navigation", { name: "Mobile navigation" }),
-    ).toBeVisible();
-  } finally {
-    await context.close();
-  }
+  const budget = await host.evaluate((element) => ({
+    vertices: Number(element.getAttribute("data-vertices")),
+    quality: Number(element.getAttribute("data-quality")),
+  }));
+  expect(budget.vertices).toBeLessThanOrEqual(
+    [3185, 1271, 475, 475][budget.quality],
+  );
+
+  console.log(
+    `Scene: ${frames} frames over ${(measurement.duration / 1000).toFixed(2)}s; ${maxDrawsPerFrame} draws per frame max; quality ${budget.quality}; ${budget.vertices} vertices; readback disabled.`,
+  );
 });

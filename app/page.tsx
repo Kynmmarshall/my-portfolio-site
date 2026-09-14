@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <section className="shell section" id="work">
+      <section className="shell section" id="work" data-scene="work">
         <Reveal>
           <div className="section-heading">
             <div>
@@ -36,10 +36,14 @@ export default function HomePage() {
           </div>
         </Reveal>
       </section>
-      <section className="shell section">
+      <section className="shell section" id="insights" data-scene="insights">
         <InsightsPreview />
       </section>
-      <section className="shell section about-section" id="about">
+      <section
+        className="shell section about-section"
+        id="about"
+        data-scene="about"
+      >
         <div className="portrait-wrap">
           <Image
             src="/media/profile/portrait.webp"

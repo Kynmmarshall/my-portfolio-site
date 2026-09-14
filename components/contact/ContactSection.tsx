@@ -27,7 +27,7 @@ export function ContactSection() {
     }
   }
   return (
-    <section id="contact" className="contact-section">
+    <section id="contact" className="contact-section" data-scene="contact">
       <div className="shell contact-inner">
         <div>
           <p className="eyebrow">

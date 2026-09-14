@@ -16,7 +16,7 @@ export default async function InsightsPage() {
   const snapshot = await readInsights();
   const data = snapshot.data;
   return (
-    <div className="shell insights-page">
+    <div className="shell insights-page" data-scene="analytics">
       <div className="page-heading">
         <p className="eyebrow">
           <span /> DEVELOPER OBSERVATORY

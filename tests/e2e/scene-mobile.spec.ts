@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
-test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while hidden", async ({
+test("CPU-throttled mobile scene keeps bounded buffers and stops drawing while hidden", async ({
   browser,
   baseURL,
 }) => {
@@ -20,10 +20,10 @@ test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while
       Object.defineProperty(navigator, "hardwareConcurrency", { value: 2 });
       Object.defineProperty(navigator, "deviceMemory", { value: 2 });
       const state = window as unknown as {
-        terrainTimes: number[];
+        sceneTimes: number[];
         testHidden: boolean;
       };
-      state.terrainTimes = [];
+      state.sceneTimes = [];
       state.testHidden = false;
       Object.defineProperty(document, "hidden", {
         get: () => state.testHidden,
@@ -34,40 +34,23 @@ test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while
         draw.apply(this, args);
         if (
           this.canvas instanceof HTMLCanvasElement &&
-          this.canvas.closest(".terrain-background")
+          this.canvas.closest(".scene-background")
         )
-          state.terrainTimes.push(performance.now());
+          state.sceneTimes.push(performance.now());
       };
     });
     await page.goto("/");
-    const host = page.locator(".terrain-background");
+
+    const host = page.locator(".scene-background");
     await expect(host).toHaveAttribute("data-ready", "true");
+    // The single background context is reserved; the hero keeps the real portrait.
     await expect(page.locator("canvas")).toHaveCount(1);
-    const measurement = await page.evaluate(async () => {
-      const state = window as unknown as { terrainTimes: number[] };
-      state.terrainTimes = [];
-      const start = performance.now();
-      await new Promise<void>((resolve) => {
-        const sample = () => {
-          if (performance.now() - start >= 3000) resolve();
-          else requestAnimationFrame(sample);
-        };
-        requestAnimationFrame(sample);
-      });
-      return {
-        times: state.terrainTimes.slice(),
-        duration: performance.now() - start,
-      };
-    });
-    const { times } = measurement;
-    const intervals = times
-      .slice(1)
-      .map((time, index) => time - times[index])
-      .sort((first, second) => first - second);
-    expect(times.length).toBeGreaterThan(0);
-    expect(times.length).toBeLessThanOrEqual(
-      Math.ceil(measurement.duration / (1000 / 60)) + 2,
-    );
+    await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
+    await expect(page.locator(".portrait-fallback")).toBeVisible();
+    await expect(host).toHaveAttribute("data-quality", "1");
+    await expect(host).toHaveAttribute("data-vertices", "1050");
+    await expect(host).toHaveAttribute("data-target-fps", "60");
+
     const metrics = await host.locator("canvas").evaluate((element) => {
       const canvas = element as HTMLCanvasElement;
       return {
@@ -77,20 +60,57 @@ test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while
     });
     expect(metrics.pixels).toBeLessThanOrEqual(180_000);
     expect(metrics.attributes?.preserveDrawingBuffer).toBe(false);
-    console.log(
-      `4x CPU-throttled mobile: ${((times.length / measurement.duration) * 1000).toFixed(1)} FPS over ${(measurement.duration / 1000).toFixed(2)}s; p95 frame interval ${intervals[Math.floor(intervals.length * 0.95)]?.toFixed(1)}ms; ${metrics.pixels} pixels; no second WebGL canvas.`,
+
+    const measurement = await page.evaluate(async () => {
+      const state = window as unknown as { sceneTimes: number[] };
+      state.sceneTimes = [];
+      const start = performance.now();
+      await new Promise<void>((resolve) => {
+        const sample = () => {
+          if (performance.now() - start >= 3000) resolve();
+          else requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      });
+      return {
+        times: state.sceneTimes.slice(),
+        duration: performance.now() - start,
+      };
+    });
+
+    // Draw calls within one frame stay close together even under 4x throttling;
+    // frames are ~16ms apart, so an 8ms gap separates them.
+    const frames: number[] = [];
+    for (let index = 0; index < measurement.times.length; index++)
+      if (
+        index === 0 ||
+        measurement.times[index] - measurement.times[index - 1] > 8
+      )
+        frames.push(measurement.times[index]);
+    expect(frames.length).toBeGreaterThan(0);
+    expect(frames.length).toBeLessThanOrEqual(
+      Math.ceil(measurement.duration / (1000 / 60)) + 2,
     );
+
+    const intervals = frames
+      .slice(1)
+      .map((time, index) => time - frames[index])
+      .sort((first, second) => first - second);
+    console.log(
+      `4x CPU-throttled mobile: ${((frames.length / measurement.duration) * 1000).toFixed(1)} FPS over ${(measurement.duration / 1000).toFixed(2)}s; p95 frame interval ${intervals[Math.floor(intervals.length * 0.95)]?.toFixed(1)}ms; ${metrics.pixels} pixels; one WebGL canvas.`,
+    );
+
     await mkdir(".data/screenshots", { recursive: true });
     await page.screenshot({
-      path: ".data/screenshots/terrain-mobile-optimized.png",
+      path: ".data/screenshots/scene-mobile-optimized.png",
     });
+
     await page.evaluate(() => {
       (window as unknown as { testHidden: boolean }).testHidden = true;
       document.dispatchEvent(new Event("visibilitychange"));
     });
     const before = await page.evaluate(
-      () =>
-        (window as unknown as { terrainTimes: number[] }).terrainTimes.length,
+      () => (window as unknown as { sceneTimes: number[] }).sceneTimes.length,
     );
     await page.evaluate(
       () =>
@@ -105,10 +125,10 @@ test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while
     );
     expect(
       await page.evaluate(
-        () =>
-          (window as unknown as { terrainTimes: number[] }).terrainTimes.length,
+        () => (window as unknown as { sceneTimes: number[] }).sceneTimes.length,
       ),
     ).toBe(before);
+
     await page.evaluate(() => {
       (window as unknown as { testHidden: boolean }).testHidden = false;
       document.dispatchEvent(new Event("visibilitychange"));
@@ -117,6 +137,9 @@ test("CPU-throttled mobile terrain keeps bounded buffers and stops drawing while
     await expect(
       page.getByRole("navigation", { name: "Mobile navigation" }),
     ).toBeVisible();
+    // Touch scrolling stays native even with smooth scrolling installed.
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(200);
   } finally {
     await context.close();
   }

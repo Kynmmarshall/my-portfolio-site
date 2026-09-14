@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Privacy" };
 export default function PrivacyPage() {
   return (
-    <article className="shell prose-page">
+    <article className="shell prose-page" data-scene="reading">
       <p className="eyebrow">LAST UPDATED / SEPTEMBER 2026</p>
       <h1>Privacy, plainly.</h1>
       <h2>No advertising or visitor tracking</h2>

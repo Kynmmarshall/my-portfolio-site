@@ -128,13 +128,13 @@ test("project logos animate and respect the global pause control", async ({
     .toBe("none");
   await page.mouse.move(300, 500);
   const background = await canvasPixels(
-    page.locator(".terrain-background canvas"),
+    page.locator(".scene-background canvas"),
   );
   await page.mouse.move(1000, 400);
   expect(
     Buffer.compare(
       background,
-      await canvasPixels(page.locator(".terrain-background canvas")),
+      await canvasPixels(page.locator(".scene-background canvas")),
     ),
   ).toBe(0);
 });

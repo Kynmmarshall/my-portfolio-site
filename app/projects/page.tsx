@@ -23,7 +23,7 @@ export default async function ProjectsPage({
       : projects.filter((project) => project.category === current);
   return (
     <>
-      <div className="shell">
+      <div className="shell" data-scene="collection">
         <div className="page-heading">
           <p className="eyebrow">
             <span /> THE PROJECT INDEX /{" "}

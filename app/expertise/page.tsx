@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function ExpertisePage() {
   return (
     <>
-      <header className="shell page-heading">
+      <header className="shell page-heading" data-scene="expertise">
         <p className="eyebrow">
           <span /> CAPABILITIES & CRAFT
         </p>

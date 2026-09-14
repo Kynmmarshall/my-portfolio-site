@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/manrope";
 import "@fontsource/ibm-plex-mono/400.css";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { VisualPreferencesProvider } from "@/context/VisualPreferencesContext";
+import { ScrollMotionProvider } from "@/context/ScrollMotionProvider";
 import { ReactiveBackground } from "@/components/motion/ReactiveBackground";
+import { SceneChoreography } from "@/components/motion/SceneChoreography";
+import { SceneLoadingStatus } from "@/components/motion/SceneLoadingStatus";
 import { ThemeProvider } from "@/context/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -37,15 +41,17 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <VisualPreferencesProvider>
-            <a className="skip-link" href="#main">
-              Skip to content
-            </a>
-            <SiteHeader />
-            <main id="main">
+            <ScrollMotionProvider>
+              <a className="skip-link" href="#main">
+                Skip to content
+              </a>
               <ReactiveBackground />
-              {children}
-            </main>
-            <SiteFooter />
+              <SceneLoadingStatus />
+              <SceneChoreography />
+              <SiteHeader />
+              <main id="main">{children}</main>
+              <SiteFooter />
+            </ScrollMotionProvider>
           </VisualPreferencesProvider>
         </ThemeProvider>
       </body>

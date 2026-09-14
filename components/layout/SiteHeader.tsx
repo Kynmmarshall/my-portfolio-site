@@ -93,6 +93,7 @@ export function SiteHeader() {
           id="mobile-menu"
           className="mobile-menu"
           aria-label="Mobile navigation"
+          data-lenis-prevent
           onKeyDown={(event) => {
             if (event.key === "Escape") setOpen(false);
           }}

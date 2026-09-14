@@ -9,12 +9,13 @@ import {
   Server,
 } from "lucide-react";
 import { HeroSceneLoader, SceneControls } from "./HeroSceneLoader";
+import { SceneInteractionZone } from "@/components/motion/SceneInteractionZone";
 import { SocialLinks } from "@/components/layout/SocialLinks";
 
 export function HeroSection() {
   return (
     <>
-      <section className="hero" aria-labelledby="hero-title">
+      <section className="hero" aria-labelledby="hero-title" data-scene="hero">
         <HeroSceneLoader />
         <div className="hero-coordinate" aria-hidden="true">
           03.8480 N / 11.5021 E<br />
@@ -50,7 +51,10 @@ export function HeroSection() {
           <Link href="#work">
             SELECTED WORK BELOW <ArrowDown size={14} />
           </Link>
-          <SceneControls />
+          <div className="hero-tools">
+            <SceneInteractionZone />
+            <SceneControls />
+          </div>
         </div>
       </section>
       <div className="shell discipline-band">

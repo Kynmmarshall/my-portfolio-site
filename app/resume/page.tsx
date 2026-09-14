@@ -8,5 +8,9 @@ export const metadata: Metadata = {
     "Kamdeu Yamdjeuson Neil Marshall's engineering profile, selected projects, technical toolkit, and contact details. Print-friendly and ready to save as PDF.",
 };
 export default function ResumePage() {
-  return <ResumeDocument />;
+  return (
+    <div data-scene="reading">
+      <ResumeDocument />
+    </div>
+  );
 }

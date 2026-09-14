@@ -84,7 +84,7 @@ test("resume presents a polished profile with logos and a working print layout",
   await page.setViewportSize({ width: 794, height: 1123 });
   await page.emulateMedia({ media: "print" });
   await expect(page.locator(".site-header")).toBeHidden();
-  await expect(page.locator(".terrain-background")).toBeHidden();
+  await expect(page.locator(".scene-background")).toBeHidden();
   await expect(page.locator(".resume-toolbar")).toBeHidden();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.pdf({

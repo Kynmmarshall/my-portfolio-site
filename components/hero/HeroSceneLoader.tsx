@@ -3,28 +3,20 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Pause, Play } from "lucide-react";
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
+import { SceneBoundary } from "@/components/three/SceneBoundary";
 
 const Scene = dynamic(() => import("@/components/three/PortraitScene"), {
   ssr: false,
 });
-class SceneBoundary extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
+
 export function HeroSceneLoader() {
   const root = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
     const container = root.current;
     if (!container) return;
@@ -37,6 +29,8 @@ export function HeroSceneLoader() {
     const limitedDevice =
       navigator.hardwareConcurrency <= 4 ||
       (memory !== undefined && memory <= 4);
+    // Low-capability touch devices keep the real portrait and the single
+    // background context instead of paying for a second WebGL context.
     if (limitedDevice && window.matchMedia("(pointer: coarse)").matches) return;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("webgl2");
@@ -52,8 +46,17 @@ export function HeroSceneLoader() {
       observer.disconnect();
     };
   }, []);
+
+  const handleFail = useCallback(() => setReady(false), []);
+  const handleReady = useCallback((value: boolean) => setReady(value), []);
+
   return (
-    <div className="hero-scene" ref={root} aria-hidden="true">
+    <div
+      className="hero-scene"
+      ref={root}
+      aria-hidden="true"
+      data-ready={ready ? "true" : "false"}
+    >
       <Image
         src="/media/profile/portrait.webp"
         alt=""
@@ -63,13 +66,14 @@ export function HeroSceneLoader() {
         className="scene-poster portrait-fallback"
       />
       {enabled && (
-        <SceneBoundary>
-          <Scene visible={visible} />
+        <SceneBoundary onFail={handleFail}>
+          <Scene visible={visible} onReady={handleReady} />
         </SceneBoundary>
       )}
     </div>
   );
 }
+
 export function SceneControls() {
   const { paused, setPaused, reducedMotion } = useVisualPreferences();
   return (
