@@ -1,8 +1,8 @@
 /**
  * Scroll-to-scene choreography.
  *
- * Pure module so the mapping from scroll depth to camera/mesh/material values can
- * be asserted without a browser, a GPU or GSAP.
+ * Pure module so the mapping from scroll depth to keyboard framing, explode amount
+ * and glow can be asserted without a browser, a GPU or GSAP.
  */
 
 export type SceneKey =
@@ -18,60 +18,46 @@ export type SceneKey =
   | "reading";
 
 export type ScenePose = {
-  cameraX: number;
-  cameraY: number;
-  cameraZ: number;
-  targetX: number;
-  targetY: number;
-  positionX: number;
-  positionY: number;
-  positionZ: number;
-  rotationX: number;
-  rotationY: number;
-  rotationZ: number;
-  scale: number;
+  /** Pan along the keyboard's long axis: -1 is one end, 1 the other, within the room the zoom leaves. */
+  panX: number;
+  /** Pan along the keyboard's short axis, in the same -1 to 1 range. */
+  panY: number;
+  /** Magnification over the scale that just covers the viewport; never below 1. */
+  zoom: number;
+  /** Perspective tilt in radians; the back of the keyboard leans away. */
+  tilt: number;
+  /** Extra in-plane roll in radians, on top of the 90 degree turn on narrow screens. */
+  roll: number;
+  /** Explode amount: 0 is assembled, 1 has every layer fully apart. */
   morph: number;
-  transmission: number;
+  /** Continuous layer index the glow favours: 0 case, 1 board, 2 plate, 3 switches, 4 keycaps. */
+  layer: number;
   accent: number;
   presence: number;
 };
 
 /** Every field is interpolated, so the list is explicit rather than derived at runtime. */
 const POSE_FIELDS = [
-  "cameraX",
-  "cameraY",
-  "cameraZ",
-  "targetX",
-  "targetY",
-  "positionX",
-  "positionY",
-  "positionZ",
-  "rotationX",
-  "rotationY",
-  "rotationZ",
-  "scale",
+  "panX",
+  "panY",
+  "zoom",
+  "tilt",
+  "roll",
   "morph",
-  "transmission",
+  "layer",
   "accent",
   "presence",
 ] as const satisfies readonly (keyof ScenePose)[];
 
 const BASE_POSE: ScenePose = {
-  cameraX: 0,
-  cameraY: 0,
-  cameraZ: 9,
-  targetX: 0,
-  targetY: 0,
-  positionX: 3.9,
-  positionY: 0.35,
-  positionZ: -0.5,
-  rotationX: 0.2,
-  rotationY: 0.4,
-  rotationZ: -0.1,
-  scale: 1,
-  morph: 0.25,
-  transmission: 1,
-  accent: 0.5,
+  panX: 0.15,
+  panY: 0,
+  zoom: 1,
+  tilt: 0.42,
+  roll: 0,
+  morph: 0.06,
+  layer: 4,
+  accent: 0.7,
   presence: 1,
 };
 
@@ -80,144 +66,104 @@ export function createScenePose(): ScenePose {
 }
 
 /**
- * Section poses. Rotation increases monotonically across a route so the sculpture
- * keeps turning the same way instead of unwinding between sections, and every
- * pose stays in the right margin, which is the part of the backdrop that the
- * readability scrim leaves visible.
+ * Section poses. The keyboard fills the viewport on every page; scrolling pans
+ * across it and takes it apart a layer at a time: keycaps first, then the
+ * switches and plate, then the bare board, before it comes back together at the
+ * contact section. Interior routes stay assembled and dimmer.
  */
 const POSES: Record<SceneKey, ScenePose> = {
   hero: { ...BASE_POSE },
   work: {
     ...BASE_POSE,
-    cameraX: 0.3,
-    cameraY: -0.12,
-    cameraZ: 9.6,
-    positionX: 3.3,
-    positionY: -0.65,
-    positionZ: -1.4,
-    rotationX: 0.62,
-    rotationY: 1.55,
-    rotationZ: 0.18,
-    scale: 0.8,
-    morph: 0.58,
-    transmission: 0.82,
-    accent: 0.34,
+    panX: 0.55,
+    panY: 0.2,
+    zoom: 1.05,
+    tilt: 0.5,
+    roll: 0.04,
+    morph: 0.4,
+    layer: 4,
+    accent: 0.6,
+    presence: 0.9,
   },
   insights: {
     ...BASE_POSE,
-    cameraX: -0.25,
-    cameraY: 0.18,
-    cameraZ: 10.4,
-    positionX: 4.05,
-    positionY: 0.85,
-    positionZ: -2.4,
-    rotationX: 0.95,
-    rotationY: 2.45,
-    rotationZ: 0.32,
-    scale: 0.6,
-    morph: 0.3,
-    transmission: 0.5,
-    accent: 0.2,
-    presence: 0.7,
+    panX: -0.5,
+    panY: -0.2,
+    zoom: 1.15,
+    tilt: 0.55,
+    roll: -0.04,
+    morph: 0.75,
+    layer: 3,
+    accent: 0.6,
+    presence: 0.85,
   },
   about: {
     ...BASE_POSE,
-    cameraX: 0.18,
-    cameraY: 0.1,
-    cameraZ: 9.2,
-    positionX: 3.05,
-    positionY: 0.25,
-    positionZ: -0.9,
-    rotationX: 1.25,
-    rotationY: 3.25,
-    rotationZ: -0.2,
-    scale: 0.86,
-    morph: 0.72,
-    transmission: 0.92,
-    accent: 0.42,
+    panX: 0.1,
+    panY: 0,
+    zoom: 1.1,
+    tilt: 0.6,
+    roll: 0.03,
+    morph: 1,
+    layer: 1,
+    accent: 0.8,
+    presence: 0.85,
   },
   contact: {
     ...BASE_POSE,
-    cameraX: 0,
-    cameraY: -0.05,
-    cameraZ: 8.4,
-    positionX: 3.6,
-    positionY: -0.3,
-    positionZ: 0.4,
-    rotationX: 1.5,
-    rotationY: 4.15,
-    rotationZ: 0.08,
-    scale: 1.02,
-    morph: 0.36,
-    transmission: 1,
-    accent: 0.62,
+    panX: 0.7,
+    panY: 0.2,
+    zoom: 1.25,
+    tilt: 0.4,
+    roll: 0,
+    morph: 0.15,
+    layer: 4,
+    accent: 1,
+    presence: 0.95,
   },
   collection: {
     ...BASE_POSE,
-    cameraZ: 10,
-    positionX: 3.8,
-    positionY: 0.5,
-    positionZ: -1.8,
-    rotationX: 0.5,
-    rotationY: 1.1,
-    scale: 0.72,
-    morph: 0.4,
-    transmission: 0.7,
-    accent: 0.28,
-    presence: 0.75,
+    panX: 0.3,
+    morph: 0.2,
+    tilt: 0.45,
+    accent: 0.5,
+    presence: 0.8,
   },
   detail: {
     ...BASE_POSE,
-    cameraZ: 10.8,
-    positionX: 4.1,
-    positionY: 0.6,
-    positionZ: -2.6,
-    rotationX: 0.8,
-    rotationY: 2.1,
-    scale: 0.58,
-    morph: 0.5,
-    transmission: 0.45,
-    accent: 0.18,
-    presence: 0.55,
+    panX: -0.4,
+    morph: 0.3,
+    layer: 3,
+    tilt: 0.5,
+    accent: 0.4,
+    presence: 0.65,
   },
   expertise: {
     ...BASE_POSE,
-    cameraZ: 9.8,
-    positionX: 3.5,
-    positionY: -0.35,
-    positionZ: -1.4,
-    rotationX: 0.7,
-    rotationY: 1.8,
-    scale: 0.78,
-    morph: 0.62,
-    transmission: 0.75,
+    panX: -0.2,
+    zoom: 1.05,
+    morph: 0.5,
+    layer: 2,
+    tilt: 0.5,
     accent: 0.55,
-    presence: 0.8,
+    presence: 0.75,
   },
   analytics: {
     ...BASE_POSE,
-    cameraZ: 11,
-    positionX: 4.2,
-    positionY: 0.75,
-    positionZ: -3,
-    rotationX: 1,
-    rotationY: 2.6,
-    scale: 0.55,
-    morph: 0.28,
-    transmission: 0.4,
-    accent: 0.16,
-    presence: 0.5,
+    panX: 0.4,
+    morph: 0.6,
+    layer: 3,
+    tilt: 0.5,
+    accent: 0.4,
+    presence: 0.65,
   },
   reading: {
     ...BASE_POSE,
-    positionX: 4.4,
-    positionY: 0.4,
-    positionZ: -3.5,
-    scale: 0.45,
-    morph: 0.2,
-    transmission: 0.3,
-    accent: 0.12,
-    presence: 0.35,
+    panX: 0,
+    morph: 0.1,
+    tilt: 0.45,
+    accent: 0.3,
+    presence: 0.5,
   },
 };
 

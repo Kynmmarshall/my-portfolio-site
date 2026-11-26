@@ -25,7 +25,7 @@ test("every launch follows the system despite previous choices", async ({
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
   await expect(page.locator("body")).toHaveCSS(
     "background-color",
-    "rgb(250, 251, 248)",
+    "rgb(235, 238, 228)",
   );
   await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -36,7 +36,7 @@ test("every launch follows the system despite previous choices", async ({
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
   await expect(page.locator("body")).toHaveCSS(
     "background-color",
-    "rgb(250, 251, 248)",
+    "rgb(235, 238, 228)",
   );
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("body")).toHaveCSS(
@@ -65,7 +65,7 @@ test("system colors apply before JavaScript even with a stale preference", async
     await page.goto(`${test.info().project.use.baseURL}/`);
     await expect(page.locator("body")).toHaveCSS(
       "background-color",
-      colorScheme === "dark" ? "rgb(23, 26, 25)" : "rgb(250, 251, 248)",
+      colorScheme === "dark" ? "rgb(23, 26, 25)" : "rgb(235, 238, 228)",
     );
     await context.close();
   }
@@ -94,7 +94,7 @@ test("system changes and keyboard controls work without saving the theme", async
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("body")).toHaveCSS(
     "background-color",
-    "rgb(250, 251, 248)",
+    "rgb(235, 238, 228)",
   );
 });
 

@@ -38,17 +38,17 @@ test("scene starts conservatively on mobile and lower capability devices", () =>
 test("scene bounds fragment and vertex work independently of device pixel ratio", () => {
   const mobile = sceneBudget(390, 844, 3, 1);
   assert.ok(390 * 844 * mobile.ratio ** 2 <= 180_001);
-  assert.equal(mobile.vertices, 1050);
+  assert.equal(mobile.vertices, 20_878);
   assert.ok(mobile.vertices <= mobile.vertexLimit);
 
   const lowest = sceneBudget(1920, 1080, 3, 2);
   assert.ok(1920 * 1080 * lowest.ratio ** 2 <= 90_001);
-  assert.equal(lowest.vertices, 297);
+  assert.equal(lowest.vertices, 13_373);
   assert.ok(lowest.vertices <= lowest.vertexLimit);
 
   const desktop = sceneBudget(1440, 900, 1, 0);
   assert.ok(1440 * 900 * desktop.ratio ** 2 <= 800_001);
-  assert.equal(desktop.vertices, 2880);
+  assert.equal(desktop.vertices, 33_831);
   assert.ok(desktop.vertices <= desktop.vertexLimit);
 });
 
@@ -60,20 +60,24 @@ test("pixel ratio never exceeds the hard ceiling on high density displays", () =
   }
 });
 
-test("expensive material features are reserved for the top tier and shadows stay off", () => {
-  assert.equal(sceneBudget(1440, 900, 1, 0).transmission, true);
-  assert.equal(sceneBudget(1440, 900, 1, 0).transmissionResolutionScale, 0.5);
-  for (const quality of [1, 2, 3] as SceneQuality[]) {
+test("reflections are reserved for the top tier, shadows stay off and draws stay few", () => {
+  assert.equal(sceneBudget(1440, 900, 1, 0).reflections, true);
+  for (const quality of [1, 2, 3] as SceneQuality[])
+    assert.equal(sceneBudget(390, 844, 2, quality).reflections, false);
+  for (const quality of [0, 1, 2, 3] as SceneQuality[]) {
     const budget = sceneBudget(390, 844, 2, quality);
-    assert.equal(budget.transmission, false);
+    assert.equal(budget.shadows, false);
+    assert.ok(budget.drawCalls <= 12);
+    assert.ok(budget.maxDrawCount <= budget.drawCountLimit);
   }
-  for (const quality of [0, 1, 2, 3] as SceneQuality[])
-    assert.equal(sceneBudget(390, 844, 2, quality).shadows, false);
 });
 
-test("the lowest tier drops the wireframe accent entirely", () => {
-  assert.ok(sceneBudget(1440, 900, 1, 0).accentTubularSegments > 0);
-  assert.equal(sceneBudget(390, 844, 2, 2).accentTubularSegments, 0);
+test("lower tiers shed geometry detail and legend resolution", () => {
+  const top = sceneBudget(1440, 900, 1, 0);
+  const bottom = sceneBudget(390, 844, 2, 2);
+  assert.ok(bottom.vertices < top.vertices);
+  assert.ok(bottom.detail.keyCorner < top.detail.keyCorner);
+  assert.ok(bottom.detail.legendTile < top.detail.legendTile);
 });
 
 test("frame scheduling keeps 60 Hz cadence without losing time or catch-up bursts", () => {

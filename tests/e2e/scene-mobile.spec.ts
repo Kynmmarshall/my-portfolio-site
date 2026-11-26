@@ -48,7 +48,7 @@ test("CPU-throttled mobile scene keeps bounded buffers and stops drawing while h
     await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
     await expect(page.locator(".portrait-fallback")).toBeVisible();
     await expect(host).toHaveAttribute("data-quality", "1");
-    await expect(host).toHaveAttribute("data-vertices", "1050");
+    await expect(host).toHaveAttribute("data-vertices", "20878");
     await expect(host).toHaveAttribute("data-target-fps", "60");
 
     const metrics = await host.locator("canvas").evaluate((element) => {

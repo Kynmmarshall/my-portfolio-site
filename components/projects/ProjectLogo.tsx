@@ -54,7 +54,7 @@ export function ProjectLogo({
             src={logo}
             alt={`${title} logo`}
             fill
-            sizes="(max-width: 640px) 180px, 240px"
+            sizes="100px"
             className="project-logo-image"
           />
         </m.div>

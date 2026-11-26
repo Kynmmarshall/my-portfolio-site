@@ -2,11 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { useTheme } from "@/context/ThemeProvider";
 import { useSceneMotion } from "@/context/ScrollMotionProvider";
-import { GlassSculpture } from "@/components/three/GlassSculpture";
 import { SceneBoundary } from "@/components/three/SceneBoundary";
 import { SceneFrameBridge } from "@/components/three/SceneFrameBridge";
+import { Keyboard } from "@/components/three/keyboard/Keyboard";
 import {
   SceneQualityMonitor,
   initialSceneQuality,
@@ -46,10 +45,9 @@ function eligible() {
   }
 }
 
-export default function GlassBackground() {
+export default function KeyboardBackground() {
   const host = useRef<HTMLDivElement>(null);
   const controller = useSceneMotion();
-  const { resolvedTheme } = useTheme();
 
   // This module is only ever imported with `ssr: false`, so measuring during the
   // first client render avoids a blank frame and a cascading state update.
@@ -160,12 +158,15 @@ export default function GlassBackground() {
       data-ready="false"
       data-quality={quality}
       data-vertices={budget?.vertices ?? 0}
+      data-vertex-limit={budget?.vertexLimit ?? 0}
+      data-draw-calls={budget?.drawCalls ?? 0}
+      data-draw-limit={budget?.drawCountLimit ?? 0}
       data-target-fps={quality === 3 ? "0" : "60"}
     >
       {active && budget && (
         <SceneBoundary onFail={handleFail}>
           <Canvas
-            camera={{ fov: 38, position: [0, 0, 9], near: 0.1, far: 40 }}
+            camera={{ fov: 38, position: [0, 0, 10], near: 0.1, far: 400 }}
             dpr={budget.ratio}
             frameloop="never"
             gl={{
@@ -179,16 +180,12 @@ export default function GlassBackground() {
             onCreated={({ gl }) => {
               gl.setClearAlpha(0);
               gl.shadowMap.enabled = false;
-              // Halves the extra full-scene pass that transmission renders each frame.
-              gl.transmissionResolutionScale =
-                budget.transmissionResolutionScale;
             }}
             onPointerMissed={undefined}
           >
             {quality !== 3 && <SceneFrameBridge />}
-            <GlassSculpture
+            <Keyboard
               budget={budget}
-              theme={resolvedTheme}
               onFirstFrame={handleFirstFrame}
             />
           </Canvas>

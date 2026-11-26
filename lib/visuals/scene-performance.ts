@@ -5,6 +5,8 @@
  * testable and the renderers cannot drift from the documented limits.
  */
 
+import { keyboardStats, type KeyboardDetail } from "./keyboard-layout.ts";
+
 export const FRAME_INTERVAL = 1000 / 60;
 export const QUALITY_WINDOW_MS = 2500;
 
@@ -16,26 +18,17 @@ export type SceneQuality = 0 | 1 | 2 | 3;
 const PIXEL_LIMITS = [800_000, 180_000, 90_000, 90_000] as const;
 const RATIO_CEILINGS = [1, 0.75, 0.75, 0.75] as const;
 
-/** TorusKnot [tubular, radial] subdivisions per tier. */
-const KNOT_SEGMENTS = [
-  [96, 24],
-  [64, 12],
-  [32, 8],
-  [32, 8],
-] as const;
+/** Geometry subdivision per tier; the lowest two tiers use sharp boxes. */
+const DETAIL = [
+  { keyCorner: 2, caseCorner: 2, tubular: 40, tube: 6, legendTile: 96 },
+  { keyCorner: 1, caseCorner: 1, tubular: 28, tube: 5, legendTile: 64 },
+  { keyCorner: 0, caseCorner: 0, tubular: 16, tube: 4, legendTile: 48 },
+  { keyCorner: 0, caseCorner: 0, tubular: 16, tube: 4, legendTile: 48 },
+] as const satisfies readonly KeyboardDetail[];
 
-/** Wireframe accent subdivisions; zero disables the accent entirely. */
-const ACCENT_SEGMENTS = [
-  [64, 6],
-  [40, 4],
-  [0, 0],
-  [0, 0],
-] as const;
-
-const VERTEX_LIMITS = [3185, 1271, 475, 475] as const;
-
-const gridVertices = (tubular: number, radial: number) =>
-  tubular > 0 && radial > 0 ? (tubular + 1) * (radial + 1) : 0;
+/** Ceilings on rendered vertices and on the largest single draw's element count. */
+const VERTEX_LIMITS = [34_000, 21_000, 13_500, 13_500] as const;
+const DRAW_COUNT_LIMITS = [5_100, 5_100, 5_100, 5_100] as const;
 
 export function initialSceneQuality({
   width,
@@ -62,8 +55,8 @@ export function sceneBudget(
   deviceRatio: number,
   quality: SceneQuality,
 ) {
-  const [tubularSegments, radialSegments] = KNOT_SEGMENTS[quality];
-  const [accentTubularSegments, accentRadialSegments] = ACCENT_SEGMENTS[quality];
+  const detail = DETAIL[quality];
+  const stats = keyboardStats(detail);
   const ratio = Math.min(
     deviceRatio || 1,
     MAX_PIXEL_RATIO,
@@ -72,17 +65,14 @@ export function sceneBudget(
   );
   return {
     ratio,
-    tubularSegments,
-    radialSegments,
-    accentTubularSegments,
-    accentRadialSegments,
-    vertices:
-      gridVertices(tubularSegments, radialSegments) +
-      gridVertices(accentTubularSegments, accentRadialSegments),
+    detail,
+    vertices: stats.vertices,
     vertexLimit: VERTEX_LIMITS[quality],
-    // Physical transmission needs an extra scene pass, so only the top tier pays for it.
-    transmission: quality === 0,
-    transmissionResolutionScale: 0.5,
+    maxDrawCount: stats.maxDrawCount,
+    drawCountLimit: DRAW_COUNT_LIMITS[quality],
+    drawCalls: stats.drawCalls,
+    // Studio reflections cost an extra render of the environment, so only the top tier pays.
+    reflections: quality === 0,
     shadows: false,
   };
 }

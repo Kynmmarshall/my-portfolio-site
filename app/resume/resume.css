@@ -9,7 +9,7 @@
   margin-bottom: 28px;
 }
 .resume-document {
-  background: light-dark(#fafbf8f5, #171a19f5);
+  background: light-dark(#f1f4eaf5, #171a19f5);
   border-top: 4px solid var(--teal);
   padding: 44px;
 }

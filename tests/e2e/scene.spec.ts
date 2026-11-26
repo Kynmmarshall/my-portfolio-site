@@ -30,7 +30,8 @@ async function nextFrames(page: Page, count = 12) {
 }
 
 /**
- * A glass frame issues several draw calls (body, accent, transmission pass), so
+ * A keyboard frame issues several draw calls (case, board, plate, switches, keycaps,
+ * underglow), so
  * draw calls cannot be counted as frames. Calls inside one frame land close
  * together even under CPU throttling, while frames are ~16ms apart, so an 8ms
  * gap separates clusters unambiguously.
@@ -156,7 +157,7 @@ test("reduced motion freezes the scene and context loss leaves a safe fallback",
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
 
-test("the opt-in control shapes the sculpture with pointer and keyboard", async ({
+test("the opt-in control shapes the keyboard with pointer and keyboard", async ({
   page,
 }) => {
   await page.goto("/");
@@ -169,7 +170,7 @@ test("the opt-in control shapes the sculpture with pointer and keyboard", async 
   await nextFrames(page);
 
   const control = page.getByRole("button", {
-    name: /Shape the background sculpture/,
+    name: /Shape the background keyboard/,
   });
   await expect(control).toBeVisible();
   const before = await pixels(canvas);
@@ -185,12 +186,39 @@ test("the opt-in control shapes the sculpture with pointer and keyboard", async 
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
 
   const reset = page.getByRole("button", {
-    name: "Reset the background sculpture",
+    name: "Reset the background keyboard",
     exact: true,
   });
   await expect(reset).toBeVisible();
   await reset.click();
   await nextFrames(page);
+});
+
+test("typing on the real keyboard never changes what the page does with the key", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".scene-background")).toHaveAttribute(
+    "data-ready",
+    "true",
+  );
+  const outcome = await page.evaluate(() => {
+    const press = (code: string) => {
+      const event = new KeyboardEvent("keydown", {
+        code,
+        key: code,
+        bubbles: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    return ["KeyA", "Enter", "Space", "ArrowDown", "F5", "Unidentified"].map(
+      press,
+    );
+  });
+  // The keycap listener is passive observation only: it must never cancel a key.
+  expect(outcome).toEqual([false, false, false, false, false, false]);
 });
 
 test("device tilt is explicitly enabled, handles permission denial, and responds to sensor input", async ({
@@ -286,19 +314,35 @@ test("scene rendering stays within its frame and geometry budgets", async ({
   page,
 }) => {
   await page.addInitScript(() => {
-    const original = WebGL2RenderingContext.prototype.drawElements;
     const state = window as unknown as {
       sceneDraws: { at: number; count: number }[];
     };
     state.sceneDraws = [];
-    WebGL2RenderingContext.prototype.drawElements = function (...args) {
-      original.apply(this, args);
-      if (
-        this.canvas instanceof HTMLCanvasElement &&
-        this.canvas.closest(".scene-background")
-      )
-        state.sceneDraws.push({ at: performance.now(), count: args[1] });
-    };
+    // Element count is the second argument of the indexed draws and the third of the array draws.
+    const hooks = [
+      ["drawElements", 1],
+      ["drawElementsInstanced", 1],
+      ["drawArrays", 2],
+      ["drawArraysInstanced", 2],
+    ] as const;
+    for (const [name, countArgument] of hooks) {
+      const proto = WebGL2RenderingContext.prototype as unknown as Record<
+        string,
+        (...args: number[]) => void
+      >;
+      const original = proto[name];
+      proto[name] = function (this: WebGL2RenderingContext, ...args: number[]) {
+        original.apply(this, args);
+        if (
+          this.canvas instanceof HTMLCanvasElement &&
+          this.canvas.closest(".scene-background")
+        )
+          state.sceneDraws.push({
+            at: performance.now(),
+            count: args[countArgument],
+          });
+      };
+    }
   });
   await page.goto("/expertise");
   const host = page.locator(".scene-background");
@@ -343,21 +387,30 @@ test("scene rendering stays within its frame and geometry budgets", async ({
   expect(frames).toBeLessThanOrEqual(
     Math.ceil(measurement.duration / (1000 / 60)) + 2,
   );
-  expect(maxDrawsPerFrame).toBeLessThanOrEqual(12);
-  // Index count of the densest allowed knot: tubular * radial * 6.
-  expect(Math.max(...draws.map((draw) => draw.count))).toBeLessThanOrEqual(
-    96 * 24 * 6,
-  );
-
-  const budget = await host.evaluate((element) => ({
-    vertices: Number(element.getAttribute("data-vertices")),
+  const limits = await host.evaluate((element) => ({
+    draw: Number(element.getAttribute("data-draw-limit")),
+    vertices: Number(element.getAttribute("data-vertex-limit")),
+    calls: Number(element.getAttribute("data-draw-calls")),
     quality: Number(element.getAttribute("data-quality")),
+    budget: Number(element.getAttribute("data-vertices")),
   }));
-  expect(budget.vertices).toBeLessThanOrEqual(
-    [3185, 1271, 475, 475][budget.quality],
+  // A frame issues exactly the draws the budget declares. The frame scheduler
+  // carries its deadline remainder, so after a stall two frames can land less
+  // than the clustering gap apart; that merged pair is the only allowed excess.
+  expect(limits.calls).toBeLessThanOrEqual(12);
+  const median = [...clusters].sort((first, second) => first - second)[
+    Math.floor(clusters.length / 2)
+  ];
+  expect(median).toBe(limits.calls);
+  expect(maxDrawsPerFrame).toBeLessThanOrEqual(limits.calls * 2);
+  // Largest single draw, in vertices (array draws) or indices (indexed draws).
+  expect(limits.draw).toBeGreaterThan(0);
+  expect(Math.max(...draws.map((draw) => draw.count))).toBeLessThanOrEqual(
+    limits.draw,
   );
+  expect(limits.budget).toBeLessThanOrEqual(limits.vertices);
 
   console.log(
-    `Scene: ${frames} frames over ${(measurement.duration / 1000).toFixed(2)}s; ${maxDrawsPerFrame} draws per frame max; quality ${budget.quality}; ${budget.vertices} vertices; readback disabled.`,
+    `Scene: ${frames} frames over ${(measurement.duration / 1000).toFixed(2)}s; ${maxDrawsPerFrame} draws per frame max; quality ${limits.quality}; ${limits.budget} vertices; readback disabled.`,
   );
 });

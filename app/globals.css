@@ -11,14 +11,14 @@
 
 :root {
   color-scheme: light dark;
-  --paper: light-dark(#fafbf8, #171a19);
+  --paper: light-dark(#ebeee4, #171a19);
   --ink: light-dark(#202725, #edf1eb);
-  --muted: light-dark(#65706b, #abb6ad);
+  --muted: light-dark(#59635e, #abb6ad);
   --line: light-dark(#dce1da, #3b4540);
   --teal: light-dark(#147668, #80d8c4);
   --lime: #d7eead;
-  --glass-surface: light-dark(#fbfcf9c4, #1d2321bf);
-  --glass-edge: light-dark(#ffffffd9, #ffffff1c);
+  --glass-surface: light-dark(#f1f4eac4, #1d2321bf);
+  --glass-edge: light-dark(#ffffff80, #ffffff1c);
   --glass-blur: 14px;
   --glass-shadow: 0 18px 44px -30px light-dark(#1b2c2559, #00000099);
   --display: "Space Grotesk Variable", sans-serif;
@@ -116,7 +116,7 @@ svg {
   color: var(--teal);
 }
 .muted-heading {
-  color: light-dark(#737e75, var(--muted));
+  color: light-dark(#5e6a5b, var(--muted));
 }
 .site-header {
   position: sticky;
@@ -242,7 +242,7 @@ svg {
   overflow: hidden;
   isolation: isolate;
   border-bottom: 1px solid var(--line);
-  background: light-dark(#f2f4edb3, #1c2220b3);
+  background: light-dark(#e6eadf40, #1c222040);
 }
 .scene-background {
   position: fixed;
@@ -260,31 +260,6 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-.scene-background::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--paper) 85%, transparent),
-    color-mix(in srgb, var(--paper) 25%, transparent) 58%,
-    transparent
-  );
-}
-.scene-background:not([data-ready="true"])::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(light-dark(#1476680b, #80d8c417) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      light-dark(#1476680b, #80d8c417) 1px,
-      transparent 1px
-    );
-  background-size: 64px 64px;
-  transform: perspective(500px) rotateX(35deg) scale(1.2);
 }
 .scene-loader {
   position: fixed;
@@ -327,17 +302,6 @@ body {
   .scene-loader {
     display: none;
   }
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(#bfcaba25 1px, transparent 1px),
-    linear-gradient(90deg, #bfcaba25 1px, transparent 1px);
-  background-size: 84px 84px;
-  mask-image: linear-gradient(90deg, transparent, black);
 }
 .hero-inner {
   position: relative;
@@ -511,7 +475,7 @@ body {
   display: inline-flex;
   padding: 3px;
   border: 1px solid light-dark(#ccd5c6, var(--line));
-  background: light-dark(#f6f8f0e8, #242b27);
+  background: light-dark(#eef1e6e8, #242b27);
   border-radius: 4px;
 }
 .segmented button {
@@ -576,7 +540,7 @@ body {
   top: 35px;
   font-family: var(--mono);
   font-size: 9px;
-  color: light-dark(#718069, var(--muted));
+  color: light-dark(#55634f, var(--muted));
   text-align: right;
   line-height: 1.8;
   pointer-events: none;
@@ -833,7 +797,7 @@ body {
   font-family: var(--mono);
   text-transform: uppercase;
   font-size: 9px;
-  color: light-dark(#697466, var(--muted));
+  color: light-dark(#5b6658, var(--muted));
 }
 .project-card h3 {
   font-size: 29px;
@@ -893,7 +857,7 @@ body {
 }
 .expertise-section {
   padding-block: 90px;
-  background: light-dark(#f0f3ebeb, #202723eb);
+  background: light-dark(#e8ece0eb, #202723eb);
   border-block: 1px solid var(--line);
 }
 .skills-grid {
@@ -935,7 +899,7 @@ body {
 }
 .skill-pillar > p:not(.eyebrow) {
   font-size: 12px;
-  color: light-dark(#65715f, var(--muted));
+  color: light-dark(#56624f, var(--muted));
   max-width: 440px;
 }
 .skill-pillar .tags {
@@ -960,7 +924,7 @@ body {
   min-height: 134px;
   border: 1px solid light-dark(#cfd8c8, var(--line));
   border-radius: 4px;
-  background: light-dark(#fafbf8ed, #171a19ed);
+  background: light-dark(#f1f4eaed, #171a19ed);
 }
 .technology-icon {
   height: 40px;
@@ -1283,7 +1247,7 @@ body {
 .gallery button {
   position: relative;
   display: block;
-  background: light-dark(#eff1e9, #242b27);
+  background: light-dark(#e6eadf, #242b27);
   aspect-ratio: 0.8;
   border-radius: 4px;
   border: 1px solid var(--line);
@@ -1468,7 +1432,7 @@ body {
 }
 .insight-numbers svg,
 .metric-row svg {
-  color: light-dark(#768b70, var(--muted));
+  color: light-dark(#5f7359, var(--muted));
 }
 .insight-numbers strong {
   font-family: var(--display);
@@ -1533,7 +1497,7 @@ body {
   border-block: 1px solid var(--line);
   padding: 15px 0;
   font-size: 10px;
-  color: light-dark(#68735f, var(--muted));
+  color: light-dark(#5c6753, var(--muted));
 }
 .snapshot-strip > a,
 .snapshot-strip > .mono {
@@ -2247,7 +2211,7 @@ body {
 }
 @supports (backdrop-filter: blur(4px)) {
   .expertise-section {
-    background: light-dark(#f0f3ebbf, #202723bf);
+    background: light-dark(#e8ece0bf, #202723bf);
     backdrop-filter: blur(12px) saturate(1.2);
   }
   .technology-mark,
@@ -2280,5 +2244,298 @@ body {
 @media print {
   .scene-interaction {
     display: none !important;
+  }
+}
+
+/*
+ * Reading surfaces.
+ * The keyboard fills the viewport on every page, so each block of text sits on a
+ * frosted panel (the hero gets one behind its copy) rather than directly on the
+ * keys, and a light veil over the scene keeps the rest of the page legible.
+ */
+:root {
+  --read-surface: light-dark(#eff2e8dc, #171a19d9);
+  --read-edge: light-dark(#ffffff73, #ffffff1f);
+  --read-radius: 22px;
+}
+.scene-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* The keyboard is dark in both themes, so the light theme only gets a hint of veil. */
+  background: light-dark(
+    color-mix(in srgb, var(--paper) 10%, transparent),
+    color-mix(in srgb, var(--paper) 38%, transparent)
+  );
+}
+.section-heading,
+.insights-preview,
+.discipline-band,
+.page-heading,
+.filter-tabs,
+.prose-page,
+.insights-page,
+.about-section > div:last-child,
+.detail-header,
+.case-layout,
+.architecture-explorer,
+.project-card,
+.hero-inner::before,
+.hero-coordinate,
+.hero-bottom > a {
+  background: var(--read-surface);
+  border: 1px solid var(--read-edge);
+  border-radius: var(--read-radius);
+  box-shadow: var(--glass-shadow);
+}
+@supports (backdrop-filter: blur(4px)) {
+  .section-heading,
+  .insights-preview,
+  .discipline-band,
+  .page-heading,
+  .filter-tabs,
+  .prose-page,
+  .insights-page,
+  .about-section > div:last-child,
+  .detail-header,
+  .case-layout,
+  .architecture-explorer,
+  .project-card,
+  .hero-inner::before,
+  .hero-coordinate,
+  .hero-bottom > a {
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+}
+/* The insights page is already one panel, so its heading must not stack a second. */
+.insights-page .page-heading {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding-inline: 0;
+  margin-block: 0;
+}
+.section-heading {
+  padding: 22px 28px;
+  margin-bottom: 28px;
+}
+.discipline-band {
+  padding: 0 30px;
+  margin-top: 28px;
+  border-radius: 18px;
+}
+.insights-preview {
+  padding: 34px 38px;
+}
+.page-heading {
+  padding: 40px 40px 34px;
+  margin-block: 28px 22px;
+}
+.filter-tabs {
+  padding-inline: 26px;
+  margin-bottom: 26px;
+}
+.prose-page {
+  padding: 48px 44px;
+  margin-block: 36px 70px;
+}
+.insights-page {
+  padding: 0 40px 50px;
+  margin-block: 28px 70px;
+}
+.about-section > div:last-child {
+  padding: 44px 48px;
+}
+.detail-header {
+  padding: 42px 44px;
+  margin-block: 28px;
+}
+.case-layout {
+  padding: 48px 44px;
+  margin-block: 28px;
+}
+.architecture-explorer {
+  padding: 30px 36px;
+}
+.hero-inner::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 30px auto 56px -36px;
+  width: min(660px, 58%);
+  border-radius: 32px;
+}
+.hero-coordinate {
+  right: 40px;
+  top: 28px;
+  padding: 9px 14px;
+  border-radius: 14px;
+}
+.hero-bottom {
+  bottom: 14px;
+}
+.hero-bottom > a {
+  padding: 10px 16px;
+  border-radius: 14px;
+}
+.button-light {
+  background: var(--read-surface);
+}
+
+.site-footer {
+  background: var(--read-surface);
+  border: 1px solid var(--read-edge);
+  border-radius: var(--read-radius);
+  box-shadow: var(--glass-shadow);
+  padding-inline: 36px;
+  margin-block: 24px;
+}
+.portrait-wrap {
+  border-radius: var(--read-radius);
+}
+@supports (backdrop-filter: blur(4px)) {
+  .site-footer {
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+}
+
+/* Project logos are keycaps: a rounded cap with a raised top face that presses on hover. */
+.project-grid {
+  gap: 24px;
+}
+.project-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 26px;
+  align-items: center;
+  padding: 24px;
+}
+.project-card-body {
+  padding: 0;
+  min-width: 0;
+}
+.project-logo {
+  width: 150px;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 38px;
+  box-shadow:
+    inset 0 -8px 0 #00000020,
+    inset 0 2px 0 #ffffff80,
+    0 16px 24px -16px #0d1f1a80,
+    0 3px 0 #0000001f;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.project-logo::before {
+  inset: 10px 10px 18px;
+  border-radius: 30px;
+  background: linear-gradient(165deg, #ffffff80, #ffffff26);
+  box-shadow:
+    inset 0 0 0 1px #ffffff66,
+    0 2px 4px #0000000f;
+  mask-image: none;
+  transform: none;
+}
+.project-logo:hover,
+.project-logo:focus-visible {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 -4px 0 #00000020,
+    inset 0 2px 0 #ffffffb3,
+    0 8px 14px -12px #0d1f1a80,
+    0 1px 0 #0000001f;
+}
+.project-logo:hover::before,
+.project-logo:focus-visible::before {
+  transform: none;
+}
+.project-logo-art,
+.project-logo[data-project="math-runner"] .project-logo-art {
+  width: 64%;
+  max-width: none;
+  margin-bottom: 6px;
+}
+.project-logo[data-project="math-runner"] .project-logo-art {
+  width: 86%;
+}
+.logo-index,
+.logo-shadow,
+.logo-open {
+  display: none;
+}
+@media (max-width: 640px) {
+  :root {
+    --read-radius: 18px;
+  }
+  .section-heading {
+    padding: 18px 20px;
+  }
+  .discipline-band {
+    padding: 12px 20px;
+  }
+  .insights-preview {
+    padding: 22px 20px;
+  }
+  .page-heading {
+    padding: 28px 22px;
+  }
+  .prose-page {
+    padding: 30px 22px;
+  }
+  .insights-page {
+    padding: 0 20px 36px;
+  }
+  .about-section > div:last-child {
+    padding: 26px 22px;
+  }
+  .detail-header,
+  .case-layout {
+    padding: 28px 22px;
+  }
+  .hero-inner::before {
+    inset: 20px -12px 232px -12px;
+    width: auto;
+  }
+  .hero-coordinate {
+    right: 16px;
+    top: 14px;
+  }
+  .project-card {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 18px;
+    padding: 20px;
+  }
+  .project-logo {
+    width: 116px;
+    border-radius: 30px;
+  }
+  .project-logo::before {
+    inset: 8px 8px 14px;
+    border-radius: 23px;
+  }
+}
+@media (forced-colors: active) {
+  .section-heading,
+  .insights-preview,
+  .discipline-band,
+  .page-heading,
+  .filter-tabs,
+  .prose-page,
+  .insights-page,
+  .about-section > div:last-child,
+  .detail-header,
+  .case-layout,
+  .architecture-explorer,
+  .project-card,
+  .hero-inner::before,
+  .hero-coordinate,
+  .hero-bottom > a,
+  .site-footer {
+    backdrop-filter: none;
+    background: Canvas;
   }
 }

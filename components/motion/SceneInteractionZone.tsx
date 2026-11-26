@@ -5,7 +5,7 @@ import { Move3D, RotateCcw } from "lucide-react";
 import { useSceneMotion } from "@/context/ScrollMotionProvider";
 
 /**
- * Opt-in direct manipulation of the background sculpture.
+ * Opt-in direct manipulation of the background keyboard.
  *
  * Pointer capture keeps the drag bound to this control, so the background canvas
  * stays `pointer-events: none` and page text, links and scrolling are untouched.
@@ -43,8 +43,8 @@ export function SceneInteractionZone() {
       <button
         type="button"
         className="icon-button scene-drag"
-        aria-label="Shape the background sculpture. Drag, or use arrow keys to rotate."
-        title="Shape the background sculpture"
+        aria-label="Shape the background keyboard. Drag, or use arrow keys to rotate."
+        title="Shape the background keyboard"
         onPointerDown={(event) => {
           const input = controller.readInput();
           dragging.current = true;
@@ -88,8 +88,8 @@ export function SceneInteractionZone() {
           type="button"
           className="icon-button"
           onClick={reset}
-          aria-label="Reset the background sculpture"
-          title="Reset the background sculpture"
+          aria-label="Reset the background keyboard"
+          title="Reset the background keyboard"
         >
           <RotateCcw size={13} />
         </button>

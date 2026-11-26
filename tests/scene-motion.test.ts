@@ -73,27 +73,27 @@ test("progress maps onto section poses and interpolates between them", () => {
   const pose = createScenePose();
 
   applyPoseAtProgress(pose, stops, 0);
-  near(pose.positionX, stops[0].pose.positionX);
+  near(pose.morph, stops[0].pose.morph);
 
   applyPoseAtProgress(pose, stops, 0.5);
-  near(pose.positionX, stops[1].pose.positionX);
+  near(pose.morph, stops[1].pose.morph);
 
   applyPoseAtProgress(pose, stops, 1);
-  near(pose.positionX, stops[2].pose.positionX);
+  near(pose.morph, stops[2].pose.morph);
 
   applyPoseAtProgress(pose, stops, 0.25);
-  const low = Math.min(stops[0].pose.rotationY, stops[1].pose.rotationY);
-  const high = Math.max(stops[0].pose.rotationY, stops[1].pose.rotationY);
-  assert.ok(pose.rotationY > low && pose.rotationY < high);
+  const low = Math.min(stops[0].pose.morph, stops[1].pose.morph);
+  const high = Math.max(stops[0].pose.morph, stops[1].pose.morph);
+  assert.ok(pose.morph > low && pose.morph < high);
 });
 
 test("out of range progress clamps to the end poses and reuses the same object", () => {
   const stops = resolveStops(home, 1600, 800);
   const pose = createScenePose();
   assert.equal(applyPoseAtProgress(pose, stops, -5), pose);
-  near(pose.positionX, stops[0].pose.positionX);
+  near(pose.panX, stops[0].pose.panX);
   applyPoseAtProgress(pose, stops, 5);
-  near(pose.positionX, stops[2].pose.positionX);
+  near(pose.panX, stops[2].pose.panX);
 });
 
 test("interior routes stay calmer than the homepage hero", () => {
@@ -101,6 +101,37 @@ test("interior routes stay calmer than the homepage hero", () => {
   for (const key of ["detail", "analytics", "reading"] as SceneKey[]) {
     const stop = resolveStops([{ key, top: 0, height: 100 }], 0, 800)[0];
     assert.ok(stop.pose.presence < hero.pose.presence);
-    assert.ok(stop.pose.scale < hero.pose.scale);
+  }
+});
+
+test("the keyboard comes apart through the page and goes back together at the contact section", () => {
+  const poses = Object.fromEntries(
+    (["hero", "work", "insights", "about", "contact"] as SceneKey[]).map(
+      (key) => [key, resolveStops([{ key, top: 0, height: 100 }], 0, 800)[0].pose],
+    ),
+  );
+  assert.ok(poses.hero.morph < poses.work.morph);
+  assert.ok(poses.work.morph < poses.insights.morph);
+  assert.ok(poses.insights.morph < poses.about.morph);
+  assert.equal(poses.about.morph, 1);
+  assert.ok(poses.contact.morph < poses.about.morph / 2);
+});
+
+test("every pose keeps the keyboard at or above the scale that fills the viewport", () => {
+  for (const key of [
+    "hero",
+    "work",
+    "insights",
+    "about",
+    "contact",
+    "collection",
+    "detail",
+    "expertise",
+    "analytics",
+    "reading",
+  ] as SceneKey[]) {
+    const pose = resolveStops([{ key, top: 0, height: 100 }], 0, 800)[0].pose;
+    assert.ok(pose.zoom >= 1, `${key} zoom ${pose.zoom}`);
+    assert.ok(Math.abs(pose.panX) <= 1 && Math.abs(pose.panY) <= 1, key);
   }
 });
