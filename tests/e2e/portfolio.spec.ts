@@ -18,7 +18,7 @@ async function canvasPixels(canvas: Locator) {
   return Buffer.from(dataUrl.split(",")[1], "base64");
 }
 
-test("portrait depth and background motion render across desktop and mobile", async ({
+test("the hero portrait is a still image that stays put across scrolling, input and resizing", async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -32,40 +32,46 @@ test("portrait depth and background motion render across desktop and mobile", as
   await expect(
     page.getByRole("button", { name: /^(Artistic|Wireframe)$/ }),
   ).toHaveCount(0);
-  const canvas = page.locator(".hero-scene canvas");
-  await expect(page.locator(".portrait-fallback")).toHaveAttribute(
-    "src",
-    /portrait/,
-  );
-  await expect(canvas).toBeVisible();
+  // The portrait is a plain image: no second WebGL canvas, nothing to drift or reappear.
+  await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
+  const portrait = page.locator(".portrait-fallback");
+  await expect(portrait).toHaveAttribute("src", /portrait/);
+  await expect(portrait).toBeVisible();
   await expect
-    .poll(async () => {
-      const statistics = await sharp(await canvasPixels(canvas)).stats();
-      return statistics.channels[0].stdev;
-    })
-    .toBeGreaterThan(10);
-  const firstFrame = await canvasPixels(canvas);
+    .poll(() =>
+      portrait.evaluate((element) => (element as HTMLImageElement).naturalWidth),
+    )
+    .toBeGreaterThan(0);
+  const box = async () =>
+    portrait.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        x: Math.round(rect.x + scrollX),
+        y: Math.round(rect.y + scrollY),
+        width: Math.round(rect.width),
+        visibility: style.visibility,
+        opacity: style.opacity,
+        animation: style.animationName,
+      };
+    });
+  const resting = await box();
+  expect(resting.visibility).toBe("visible");
+  expect(resting.opacity).toBe("1");
+  expect(resting.animation).toBe("none");
+
   await page.mouse.move(1100, 310);
-  await expect
-    .poll(async () => Buffer.compare(firstFrame, await canvasPixels(canvas)))
-    .not.toBe(0);
-  await page.evaluate(() => window.scrollTo(0, 160));
-  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page
-    .getByRole("button", { name: "Pause animation", exact: true })
-    .click();
+  await page.waitForTimeout(500);
+  expect(await box()).toEqual(resting);
+  for (const position of [160, 700, 0]) {
+    await page.evaluate((top) => window.scrollTo(0, top), position);
+    await page.waitForTimeout(400);
+    expect(await box()).toEqual(resting);
+  }
+  await expect(portrait).toBeVisible();
+
   await mkdir(".data/screenshots", { recursive: true });
   await page.screenshot({ path: ".data/screenshots/desktop.png" });
-  await sharp(await canvasPixels(canvas))
-    .webp({ quality: 88 })
-    .toFile(".data/screenshots/portrait-frame.webp");
-  await page
-    .getByRole("button", { name: "Resume animation", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Pause animation", exact: true })
-    .click();
   for (const viewport of [
     { width: 390, height: 844 },
     { width: 320, height: 568 },
@@ -73,16 +79,7 @@ test("portrait depth and background motion render across desktop and mobile", as
     { width: 1920, height: 1080 },
   ]) {
     await page.setViewportSize(viewport);
-    await expect(
-      page.getByRole("button", { name: /^(Artistic|Wireframe)$/ }),
-    ).toHaveCount(0);
-    await expect(canvas).toBeVisible();
-    await expect
-      .poll(
-        async () =>
-          (await sharp(await canvasPixels(canvas)).stats()).channels[0].stdev,
-      )
-      .toBeGreaterThan(5);
+    await expect(portrait).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(
@@ -95,11 +92,6 @@ test("portrait depth and background motion render across desktop and mobile", as
     });
   }
   expect(errors).toEqual([]);
-  await canvas.evaluate((element) =>
-    element.dispatchEvent(new Event("webglcontextlost", { cancelable: true })),
-  );
-  await expect(canvas).toHaveCount(0);
-  await expect(page.locator(".scene-poster")).toBeVisible();
 });
 
 test("project logos animate and respect the global pause control", async ({
@@ -275,13 +267,13 @@ test("gameplay previews, dashboard accessibility and full-page composition", asy
     });
   }
   await page.goto("/");
-  await expect(page.locator(".hero-scene canvas")).toBeVisible();
+  await expect(page.locator(".portrait-fallback")).toBeVisible();
   await expect
     .poll(
       async () =>
         (
           await sharp(
-            await canvasPixels(page.locator(".hero-scene canvas")),
+            await canvasPixels(page.locator(".scene-background canvas")),
           ).stats()
         ).channels[0].stdev,
     )

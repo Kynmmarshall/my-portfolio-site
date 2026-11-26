@@ -157,6 +157,59 @@ test("reduced motion freezes the scene and context loss leaves a safe fallback",
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
 
+test("a lost WebGL context is recovered with a fresh canvas instead of leaving the page without a background", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const host = page.locator(".scene-background");
+  await expect(host).toHaveAttribute("data-ready", "true");
+  // Tag the live canvas so a replacement is distinguishable from it.
+  await host
+    .locator("canvas")
+    .evaluate((element) => element.setAttribute("data-generation", "old"));
+  await host
+    .locator("canvas")
+    .evaluate((element) =>
+      element.dispatchEvent(new Event("webglcontextlost", { cancelable: true })),
+    );
+  await expect(host).toHaveAttribute("data-ready", "false");
+  await expect(host).toHaveAttribute("data-ready", "true", { timeout: 15000 });
+  await expect(host.locator("canvas")).toHaveCount(1);
+  await expect(host.locator("canvas")).not.toHaveAttribute(
+    "data-generation",
+    "old",
+  );
+  // The rebuilt canvas actually draws.
+  await expect
+    .poll(
+      async () => (await sharp(await pixels(host.locator("canvas"))).stats()).channels[3].max,
+      { timeout: 15000 },
+    )
+    .toBeGreaterThan(10);
+});
+
+test("an idle page whose animation frames are throttled keeps its quality and stays on screen", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  // Browsers give idle, covered or backgrounded windows about one frame a second.
+  await page.addInitScript(() => {
+    window.requestAnimationFrame = (callback) =>
+      window.setTimeout(() => callback(performance.now()), 1000);
+  });
+  await page.goto("/");
+  const host = page.locator(".scene-background");
+  await expect(host).toHaveAttribute("data-ready", "true", { timeout: 30000 });
+  const before = await host.getAttribute("data-quality");
+  // The old monitor read these frames as an overloaded GPU and stepped quality down
+  // within about five seconds, then froze the scene.
+  await page.waitForTimeout(14000);
+  await expect(host).toHaveAttribute("data-quality", before ?? "0");
+  await expect(host).toHaveAttribute("data-target-fps", "60");
+  await expect(host).toHaveAttribute("data-ready", "true");
+  await expect(host.locator("canvas")).toHaveCount(1);
+});
+
 test("the opt-in control shapes the keyboard with pointer and keyboard", async ({
   page,
 }) => {

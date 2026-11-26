@@ -86,37 +86,79 @@ export function nextFrameDeadline(deadline: number, now: number) {
 }
 
 /**
- * Demotes quality only after sustained pressure, and never promotes again during
- * a mount so a struggling GPU is not repeatedly reloaded.
+ * An interval this long is a throttled, covered or backgrounded page, not a slow
+ * GPU. Browsers drop animation frames to about one per second for idle windows,
+ * so such frames say nothing about rendering cost and must never demote quality.
+ */
+export const STALL_MS = 750;
+/** Automatic demotion stops here. The frozen tier is never chosen automatically. */
+export const MAX_AUTO_QUALITY: SceneQuality = 2;
+/** Consecutive healthy windows (15 seconds) before one tier is won back. */
+export const RECOVERY_WINDOWS = 6;
+/** Tiers that may be won back in one mount, so a marginal GPU cannot flap forever. */
+export const MAX_RECOVERIES = 3;
+
+/**
+ * Demotes quality only after sustained pressure on a page that is actually being
+ * drawn, and wins it back after a sustained healthy stretch (never above the tier
+ * the mount started at). Stalled intervals are discarded, so idling, switching
+ * windows or a sleeping laptop cannot degrade the scene.
  */
 export class SceneQualityMonitor {
   private elapsed = 0;
   private frames = 0;
   private missed = 0;
   private slowWindows = 0;
+  private healthyWindows = 0;
+  private best: SceneQuality | null = null;
+  private recoveries = 0;
 
+  /** Drops the window being measured; used on pause, resume and focus changes. */
   reset() {
     this.elapsed = 0;
     this.frames = 0;
     this.missed = 0;
     this.slowWindows = 0;
+    this.healthyWindows = 0;
   }
 
   observe(interval: number, quality: SceneQuality): SceneQuality {
-    if (!Number.isFinite(interval) || interval <= 0 || quality === 3)
+    if (!Number.isFinite(interval) || interval <= 0) return quality;
+    if (this.best === null) this.best = quality;
+    if (interval >= STALL_MS) {
+      this.reset();
       return quality;
-    this.elapsed += Math.min(interval, QUALITY_WINDOW_MS);
+    }
+    this.elapsed += interval;
     this.frames++;
     if (interval > FRAME_INTERVAL * 1.45) this.missed++;
     if (this.elapsed < QUALITY_WINDOW_MS) return quality;
-    const overloaded =
-      this.elapsed / this.frames > 20 || this.missed / this.frames > 0.15;
+
+    const average = this.elapsed / this.frames;
+    const missedShare = this.missed / this.frames;
+    const overloaded = average > 20 || missedShare > 0.15;
+    const healthy = !overloaded && average <= 18.5 && missedShare <= 0.05;
     this.slowWindows = overloaded ? this.slowWindows + 1 : 0;
+    this.healthyWindows = healthy ? this.healthyWindows + 1 : 0;
     this.elapsed = 0;
     this.frames = 0;
     this.missed = 0;
-    if (this.slowWindows < 2) return quality;
-    this.slowWindows = 0;
-    return Math.min(3, quality + 1) as SceneQuality;
+
+    if (this.slowWindows >= 2 && quality < MAX_AUTO_QUALITY) {
+      this.slowWindows = 0;
+      this.healthyWindows = 0;
+      return (quality + 1) as SceneQuality;
+    }
+    if (
+      this.healthyWindows >= RECOVERY_WINDOWS &&
+      quality > this.best &&
+      this.recoveries < MAX_RECOVERIES
+    ) {
+      this.recoveries++;
+      this.slowWindows = 0;
+      this.healthyWindows = 0;
+      return (quality - 1) as SceneQuality;
+    }
+    return quality;
   }
 }

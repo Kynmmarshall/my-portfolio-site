@@ -2,7 +2,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   FRAME_INTERVAL,
+  MAX_AUTO_QUALITY,
   MAX_PIXEL_RATIO,
+  MAX_RECOVERIES,
+  QUALITY_WINDOW_MS,
+  RECOVERY_WINDOWS,
+  STALL_MS,
   SceneQualityMonitor,
   initialSceneQuality,
   nextFrameDeadline,
@@ -97,35 +102,93 @@ test("frame scheduling keeps 60 Hz cadence without losing time or catch-up burst
   assert.ok(draws >= 119 && draws <= 121);
 });
 
-test("quality adapts only to sustained pressure and never oscillates upward", () => {
+const feed = (
+  monitor: SceneQualityMonitor,
+  quality: SceneQuality,
+  frames: number,
+  interval: number,
+) => {
+  for (let index = 0; index < frames; index++)
+    quality = monitor.observe(interval, quality);
+  return quality;
+};
+/** Frames needed to fill one measurement window at a given interval. */
+const framesPerWindow = (interval: number) =>
+  Math.ceil(QUALITY_WINDOW_MS / interval) + 1;
+
+test("quality drops only after two consecutive slow windows and never freezes on its own", () => {
   const monitor = new SceneQualityMonitor();
   let quality: SceneQuality = 1;
-  for (let index = 0; index < 300; index++)
-    quality = monitor.observe(FRAME_INTERVAL, quality);
+  quality = feed(monitor, quality, 300, FRAME_INTERVAL);
   assert.equal(quality, 1);
-  for (let index = 0; index < 80; index++)
-    quality = monitor.observe(1000 / 30, quality);
+  quality = feed(monitor, quality, framesPerWindow(1000 / 30), 1000 / 30);
   assert.equal(quality, 1);
-  for (let index = 0; index < 80; index++)
-    quality = monitor.observe(1000 / 30, quality);
+  quality = feed(monitor, quality, framesPerWindow(1000 / 30), 1000 / 30);
   assert.equal(quality, 2);
-  for (let index = 0; index < 160; index++)
-    quality = monitor.observe(1000 / 30, quality);
-  assert.equal(quality, 3);
-  monitor.reset();
-  assert.equal(monitor.observe(1000, 1), 1);
+  // Sustained pressure stops at the lowest live tier; the frozen tier is never automatic.
+  quality = feed(monitor, quality, 600, 1000 / 30);
+  assert.equal(quality, MAX_AUTO_QUALITY);
+  assert.equal(quality, 2);
 });
 
-test("severely slow visible frames still reduce quality and a pause reset discards earlier pressure", () => {
+test("throttled, covered or backgrounded frames are ignored instead of degrading the scene", () => {
+  const monitor = new SceneQualityMonitor();
+  // An idle window gets about one frame per second from the browser, for minutes.
+  let quality = feed(monitor, 0, 600, 1000);
+  assert.equal(quality, 0);
+  quality = feed(monitor, quality, 40, STALL_MS);
+  assert.equal(quality, 0);
+  // A single long gap between two slow windows breaks the "consecutive" requirement.
+  quality = feed(monitor, quality, framesPerWindow(1000 / 30), 1000 / 30);
+  quality = monitor.observe(120_000, quality);
+  quality = feed(monitor, quality, framesPerWindow(1000 / 30), 1000 / 30);
+  assert.equal(quality, 0);
+  // Coming back to a healthy page leaves quality where it was.
+  quality = feed(monitor, quality, 600, FRAME_INTERVAL);
+  assert.equal(quality, 0);
+});
+
+test("genuinely slow visible frames still reduce quality, and a reset discards earlier pressure", () => {
   const monitor = new SceneQualityMonitor();
   let quality: SceneQuality = 1;
-  for (let index = 0; index < 10; index++)
-    quality = monitor.observe(500, quality);
+  quality = feed(monitor, quality, 10, 500);
   assert.equal(quality, 2);
-  for (let index = 0; index < 5; index++)
-    quality = monitor.observe(500, quality);
+  quality = feed(monitor, quality, 5, 500);
   monitor.reset();
-  for (let index = 0; index < 300; index++)
-    quality = monitor.observe(FRAME_INTERVAL, quality);
+  quality = feed(monitor, quality, 300, FRAME_INTERVAL);
   assert.equal(quality, 2);
+});
+
+test("quality is won back after a sustained healthy stretch, never above where it started", () => {
+  const monitor = new SceneQualityMonitor();
+  const healthyStretch = Math.ceil((RECOVERY_WINDOWS * QUALITY_WINDOW_MS) / FRAME_INTERVAL) + 150;
+  let quality: SceneQuality = 1;
+  quality = feed(monitor, quality, 20, 1000 / 20);
+  assert.equal(quality, 1);
+  quality = feed(monitor, quality, framesPerWindow(1000 / 30) * 2, 1000 / 30);
+  assert.equal(quality, 2);
+  // A short healthy stretch is not enough.
+  quality = feed(monitor, quality, 300, FRAME_INTERVAL);
+  assert.equal(quality, 2);
+  quality = feed(monitor, quality, healthyStretch, FRAME_INTERVAL);
+  assert.equal(quality, 1);
+  // It started at tier 1, so tier 0 is never reached however long it runs well.
+  quality = feed(monitor, quality, healthyStretch * 2, FRAME_INTERVAL);
+  assert.equal(quality, 1);
+});
+
+test("a marginal GPU cannot flap between tiers forever", () => {
+  const monitor = new SceneQualityMonitor();
+  const healthyStretch = Math.ceil((RECOVERY_WINDOWS * QUALITY_WINDOW_MS) / FRAME_INTERVAL) + 150;
+  let quality: SceneQuality = 0;
+  let promotions = 0;
+  for (let cycle = 0; cycle < 8; cycle++) {
+    const before = quality;
+    quality = feed(monitor, quality, framesPerWindow(1000 / 30) * 2, 1000 / 30);
+    const lowered = quality;
+    quality = feed(monitor, quality, healthyStretch, FRAME_INTERVAL);
+    if (quality < lowered) promotions++;
+    assert.ok(quality >= 0 && quality <= MAX_AUTO_QUALITY, `cycle ${cycle} from ${before}`);
+  }
+  assert.ok(promotions <= MAX_RECOVERIES, `${promotions} recoveries`);
 });

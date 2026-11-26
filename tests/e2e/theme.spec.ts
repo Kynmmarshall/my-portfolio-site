@@ -234,7 +234,7 @@ test("portrait icons are served as the browser and touch icons", async ({
   }
 });
 
-test("dark mode keeps portrait and background canvases visible and responsive", async ({
+test("dark mode keeps the portrait and the background keyboard visible and responsive", async ({
   page,
 }) => {
   await enableCanvasReadback(page);
@@ -243,33 +243,21 @@ test("dark mode keeps portrait and background canvases visible and responsive", 
   await mkdir(".data/screenshots", { recursive: true });
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    const portrait = page.locator(".hero-scene canvas");
-    const terrain = page.locator(".scene-background canvas");
-    for (const canvas of [portrait, terrain]) {
-      await expect(canvas).toBeVisible();
-      await expect
-        .poll(async () => {
-          const image = await canvas.evaluate((element) =>
-            (element as HTMLCanvasElement).toDataURL(),
-          );
-          const stats = await sharp(
-            Buffer.from(image.split(",")[1], "base64"),
-          ).stats();
-          return Math.max(...stats.channels.map((channel) => channel.stdev));
-        })
-        .toBeGreaterThan(5);
-    }
-    const firstFrame = await portrait.evaluate((element) =>
-      (element as HTMLCanvasElement).toDataURL(),
-    );
-    await page.mouse.move(width - 25, 200);
+    const portrait = page.locator(".portrait-fallback");
+    const keyboard = page.locator(".scene-background canvas");
+    await expect(portrait).toBeVisible();
+    await expect(keyboard).toBeVisible();
     await expect
-      .poll(() =>
-        portrait.evaluate((element) =>
+      .poll(async () => {
+        const image = await keyboard.evaluate((element) =>
           (element as HTMLCanvasElement).toDataURL(),
-        ),
-      )
-      .not.toBe(firstFrame);
+        );
+        const stats = await sharp(
+          Buffer.from(image.split(",")[1], "base64"),
+        ).stats();
+        return Math.max(...stats.channels.map((channel) => channel.stdev));
+      })
+      .toBeGreaterThan(5);
     await page.screenshot({
       path: `.data/screenshots/theme-dark-canvas-${width}.png`,
     });

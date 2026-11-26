@@ -499,9 +499,6 @@ body {
   z-index: 1;
   pointer-events: none;
 }
-.hero-scene canvas {
-  touch-action: pan-y;
-}
 .scene-poster {
   position: absolute;
   inset: 0;
@@ -520,9 +517,6 @@ body {
   top: 50% !important;
   bottom: auto !important;
   transform: translate(-50%, -50%) translateY(-18px);
-}
-.hero-scene[data-ready="true"] .portrait-fallback {
-  visibility: hidden;
 }
 @media (max-width: 640px) {
   .portrait-fallback {
@@ -2537,5 +2531,440 @@ body {
   .site-footer {
     backdrop-filter: none;
     background: Canvas;
+  }
+}
+
+/* ===== Header: slides away while scrolling down, returns on the way up ===== */
+.site-header {
+  transition:
+    transform 0.4s cubic-bezier(0.22, 0.9, 0.28, 1),
+    box-shadow 0.3s ease;
+  will-change: transform;
+}
+.site-header[data-hidden="true"] {
+  transform: translateY(-101%);
+  box-shadow: none;
+}
+
+/* ===== Controls: a solid surface and larger icons so they read over the keyboard ===== */
+.icon-button {
+  background: var(--read-surface);
+  border-color: light-dark(#9aa994, #ffffff40);
+  color: var(--ink);
+}
+.hero-tools {
+  gap: 6px;
+  padding: 6px;
+  background: var(--read-surface);
+  border: 1px solid var(--read-edge);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+}
+.hero-tools .icon-button {
+  width: 42px;
+  height: 42px;
+  border-color: transparent;
+  border-radius: 11px;
+  background: transparent;
+}
+.hero-tools .icon-button:hover:not(:disabled) {
+  background: light-dark(#dfe5d6, #303b35);
+}
+@supports (backdrop-filter: blur(4px)) {
+  .hero-tools {
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+}
+
+/* ===== Layout fixes ===== */
+.hero-bottom {
+  justify-content: flex-end;
+}
+.project-card-body {
+  justify-self: stretch;
+  width: 100%;
+}
+.contact-actions .text-link {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  .portrait-wrap {
+    justify-self: center;
+  }
+  /*
+   * The portrait is anchored to the bottom of the hero and the text panel is
+   * given matching room above it, so however tall the copy grows the panel can
+   * never cover the portrait.
+   */
+  .hero-inner {
+    padding-bottom: 372px;
+  }
+  .hero-inner::before {
+    inset: 20px -12px 348px -12px;
+  }
+  .hero-scene {
+    top: auto;
+    bottom: 0;
+    height: 360px;
+  }
+  .portrait-fallback {
+    width: 78% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    object-position: center bottom !important;
+  }
+}
+
+/*
+ * ===== Text sizes =====
+ * Screen only, so print and the A4 resume keep their own metrics. These sit last
+ * on purpose: they also replace the smaller mobile sizes declared earlier.
+ */
+@media screen {
+  body {
+    font-size: 16px;
+  }
+  .mono,
+  .eyebrow {
+    font-size: 12px;
+  }
+  .desktop-nav,
+  .header-contact {
+    font-size: 14px;
+  }
+  .hero-topline {
+    font-size: 12px;
+  }
+  .hero-copy {
+    font-size: 17px;
+    max-width: 470px;
+  }
+  .button {
+    font-size: 14px;
+  }
+  .social-links a {
+    font-size: 13px;
+  }
+  .hero-bottom,
+  .hero-coordinate {
+    font-size: 11px;
+  }
+  .segmented button {
+    font-size: 12px;
+  }
+  .discipline-band {
+    font-size: 12px;
+  }
+  .section-heading h2 small {
+    font-size: 15px;
+  }
+  .section-description,
+  .text-link,
+  .project-card p,
+  .skill-pillar > p:not(.eyebrow),
+  .store-release p,
+  .case-meta dd,
+  .architecture-flow p,
+  .data-empty p,
+  .data-details,
+  .filter-tabs a {
+    font-size: 14px;
+  }
+  .preview-control {
+    font-size: 12px;
+  }
+  .project-overline,
+  .tags > span,
+  .skill-pillar .eyebrow,
+  .technology-kind,
+  .about-facts span,
+  .copyright,
+  .case-meta dt,
+  .analytics-heading .mono,
+  .chart-axis,
+  .service-foot {
+    font-size: 11px;
+  }
+  .project-links {
+    font-size: 13px;
+  }
+  .technology-name,
+  .highlight-list li {
+    font-size: 15px;
+  }
+  .technology-source,
+  .weekly-heading .mono {
+    font-size: 10px;
+  }
+  .evidence-link,
+  .about-facts,
+  .site-footer p,
+  .footer-links,
+  .store-release .eyebrow,
+  .insight-numbers span,
+  .data-note,
+  .snapshot-strip,
+  .service-name > div > span,
+  .service-state,
+  .status-legend {
+    font-size: 12px;
+  }
+  .about-section p:not(.eyebrow),
+  .case-body p {
+    font-size: 16px;
+  }
+  .contact-section p:not(.eyebrow),
+  .email-row {
+    font-size: 15px;
+  }
+  .intent-picker legend,
+  .intent-picker label,
+  .contact-actions .text-link,
+  .language-legend > div,
+  .metric-row span,
+  .media-dialog-header {
+    font-size: 13px;
+  }
+  .page-heading > p:not(.eyebrow),
+  .prose-page p,
+  .prose-page li {
+    font-size: 17px;
+  }
+  .preview-languages h3 {
+    font-size: 17px;
+  }
+}
+@media screen and (max-width: 640px) {
+  .hero-topline,
+  .hero-bottom,
+  .discipline-band,
+  .metric-row span,
+  .service-state {
+    font-size: 11px;
+  }
+  .hero-copy {
+    font-size: 15px;
+    max-width: 360px;
+  }
+  .button {
+    font-size: 13px;
+  }
+  .hero-inner .social-links a {
+    font-size: 12px;
+  }
+  .about-section p:not(.eyebrow),
+  .contact-section p:not(.eyebrow),
+  .page-heading > p:not(.eyebrow),
+  .prose-page p,
+  .prose-page li {
+    font-size: 15px;
+  }
+}
+
+/* ===== Boot splash: a small terminal that starts the site up ===== */
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 26px;
+  padding: 24px;
+  background:
+    radial-gradient(60% 50% at 50% 36%, #52e0c21f, transparent 70%), #090e0c;
+  color: #cfe9e0;
+  font-family: var(--mono);
+  animation: boot-failsafe 0.3s ease 5.5s forwards;
+}
+.boot-window {
+  width: min(560px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid #52e0c233;
+  border-radius: 18px;
+  background: #0e1512;
+  box-shadow: 0 40px 90px -30px #000c;
+  animation: boot-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.boot-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border-bottom: 1px solid #ffffff0d;
+  background: #121b17;
+  font-size: 13px;
+  color: #8aa096;
+}
+.boot-titlebar b {
+  margin-inline: auto 30px;
+  font-weight: 400;
+}
+.boot-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+.boot-dot:nth-child(2) {
+  background: #febc2e;
+}
+.boot-dot:nth-child(3) {
+  background: #28c840;
+}
+.boot-body {
+  min-height: 196px;
+  padding: 18px 20px 6px;
+  font-size: 15px;
+}
+.boot-line {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.75;
+  color: #cfe9e0;
+  animation: boot-line 0.25s ease both;
+}
+.boot-line[data-active="true"] {
+  color: #ffffff;
+}
+.boot-path {
+  color: #52e0c2;
+}
+.boot-dollar {
+  margin-inline: 0.6ch 0.4ch;
+  color: #ffb454;
+}
+.boot-mark {
+  display: inline-block;
+  width: 2.2ch;
+  color: #52e0c2;
+}
+.boot-line[data-active="true"] .boot-mark {
+  color: #ffb454;
+}
+.boot-caret {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1.05em;
+  margin-left: 0.6ch;
+  vertical-align: -0.15em;
+  background: #52e0c2;
+  animation: boot-blink 1s steps(1) infinite;
+}
+.boot-ready {
+  color: #52e0c2;
+}
+.boot-meter {
+  height: 6px;
+  margin: 10px 20px 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #ffffff14;
+}
+.boot-meter span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2fb89f, #52e0c2 70%, #b6fff0);
+  box-shadow: 0 0 14px #52e0c2aa;
+  transition: width 0.12s linear;
+}
+.boot-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 18px;
+  font-size: 14px;
+  color: #8aa096;
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+}
+.boot-key {
+  padding: 7px 14px;
+  border: 1px solid #ffffff1a;
+  border-bottom-width: 4px;
+  border-radius: 9px;
+  background: #34413c;
+  color: #c9efe3;
+  font: 600 13px var(--mono);
+  transition:
+    transform 0.12s ease,
+    border-bottom-width 0.12s ease,
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.boot-key[data-down="true"] {
+  transform: translateY(3px);
+  border-bottom-width: 1px;
+  background: #2fb89f;
+  color: #06201a;
+  box-shadow: 0 0 22px #52e0c2aa;
+}
+.boot-sign {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: #7d918a;
+}
+.boot-loader[data-state="done"] {
+  pointer-events: none;
+  animation: boot-exit 0.6s cubic-bezier(0.7, 0, 0.2, 1) 0.3s forwards;
+}
+@keyframes boot-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+@keyframes boot-line {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+@keyframes boot-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes boot-exit {
+  to {
+    opacity: 0;
+    transform: translateY(-3%) scale(1.03);
+    filter: blur(8px);
+    visibility: hidden;
+  }
+}
+/* Without JavaScript nothing ever clears the splash, so it clears itself. */
+@keyframes boot-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+html[data-boot="skip"] .boot-loader {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-loader {
+    display: none;
+  }
+}
+@media print {
+  .boot-loader {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .boot-body {
+    min-height: 176px;
+    font-size: 14px;
   }
 }

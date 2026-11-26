@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ArrowUpRight, Menu, X, Pause, Play } from "lucide-react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import { DeviceTiltControl } from "@/components/motion/DeviceTiltControl";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -20,8 +21,14 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { paused, setPaused, reducedMotion } = useVisualPreferences();
+  // Reduced motion and an open menu keep the header pinned in view.
+  const { hidden, reveal } = useAutoHideHeader(reducedMotion || open);
   return (
-    <header className="site-header">
+    <header
+      className="site-header"
+      data-hidden={hidden ? "true" : "false"}
+      onFocus={reveal}
+    >
       <div className="shell header-inner">
         <Link
           href="/"

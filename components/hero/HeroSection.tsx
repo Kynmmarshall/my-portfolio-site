@@ -1,6 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowDown,
   ArrowDownRight,
   ArrowUpRight,
   Code2,
@@ -8,7 +8,7 @@ import {
   GitBranch,
   Server,
 } from "lucide-react";
-import { HeroSceneLoader, SceneControls } from "./HeroSceneLoader";
+import { SceneControls } from "./SceneControls";
 import { SceneInteractionZone } from "@/components/motion/SceneInteractionZone";
 import { SocialLinks } from "@/components/layout/SocialLinks";
 
@@ -16,7 +16,17 @@ export function HeroSection() {
   return (
     <>
       <section className="hero" aria-labelledby="hero-title" data-scene="hero">
-        <HeroSceneLoader />
+        {/* A plain image: no canvas, no parallax, nothing that can drift or reappear on scroll. */}
+        <div className="hero-scene" aria-hidden="true">
+          <Image
+            src="/media/profile/portrait.webp"
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 640px) 90vw, 38vw"
+            className="scene-poster portrait-fallback"
+          />
+        </div>
         <div className="hero-coordinate" aria-hidden="true">
           03.8480 N / 11.5021 E<br />
           YAOUNDE, CAMEROON
@@ -48,9 +58,6 @@ export function HeroSection() {
           <SocialLinks label="Connect with Marshall" />
         </div>
         <div className="shell hero-bottom">
-          <Link href="#work">
-            SELECTED WORK BELOW <ArrowDown size={14} />
-          </Link>
           <div className="hero-tools">
             <SceneInteractionZone />
             <SceneControls />

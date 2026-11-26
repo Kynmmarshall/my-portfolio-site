@@ -7,6 +7,7 @@ import sharp from "sharp";
 import ffmpeg from "ffmpeg-static";
 import { chromium } from "@playwright/test";
 import { imageSources, animationSources } from "../content/media.ts";
+import { preparePortrait } from "./portrait-fade.ts";
 
 const exec = promisify(execFile);
 const root = join(process.cwd(), "public/media");
@@ -73,11 +74,20 @@ for (const source of imageSources) {
     process.exitCode = 1;
   }
 }
-await optimize(
-  await readFile("images/me.png"),
-  join(root, "profile/portrait.webp"),
-  "images/me.png",
-);
+const portrait = await preparePortrait(await readFile("images/me.png"));
+await mkdir(join(root, "profile"), { recursive: true });
+await writeFile(join(root, "profile/portrait.webp"), portrait.data);
+manifest.push({
+  source: "images/me.png",
+  local: "/public/media/profile/portrait.webp",
+  width: portrait.info.width,
+  height: portrait.info.height,
+  bytes: portrait.info.size,
+  importedAt: new Date().toISOString(),
+  attribution:
+    "Portrait supplied by the developer; the lower edge is faded for presentation.",
+});
+console.log(`Prepared /profile/portrait.webp (${Math.round(portrait.info.size / 1024)}KB)`);
 await mkdir(".data/original-media", { recursive: true });
 for (const source of animationSources) {
   try {

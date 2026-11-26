@@ -11,6 +11,7 @@ import { ScrollMotionProvider } from "@/context/ScrollMotionProvider";
 import { ReactiveBackground } from "@/components/motion/ReactiveBackground";
 import { SceneChoreography } from "@/components/motion/SceneChoreography";
 import { SceneLoadingStatus } from "@/components/motion/SceneLoadingStatus";
+import { BootLoader } from "@/components/motion/BootLoader";
 import { ThemeProvider } from "@/context/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -37,11 +38,19 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-theme="system">
+    <html lang="en" data-theme="system" suppressHydrationWarning>
       <body>
+        {/* Runs before first paint so a repeat visit in this tab never flashes the boot splash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('boot-seen'))document.documentElement.dataset.boot='skip'}catch(e){}",
+          }}
+        />
         <ThemeProvider>
           <VisualPreferencesProvider>
             <ScrollMotionProvider>
+              <BootLoader />
               <a className="skip-link" href="#main">
                 Skip to content
               </a>

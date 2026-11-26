@@ -81,7 +81,7 @@ export function SceneInteractionZone() {
           event.preventDefault();
         }}
       >
-        <Move3D size={13} />
+        <Move3D size={18} />
       </button>
       {shaped && (
         <button
@@ -91,7 +91,7 @@ export function SceneInteractionZone() {
           aria-label="Reset the background keyboard"
           title="Reset the background keyboard"
         >
-          <RotateCcw size={13} />
+          <RotateCcw size={18} />
         </button>
       )}
     </div>

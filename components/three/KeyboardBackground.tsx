@@ -21,6 +21,14 @@ import {
 
 type Viewport = { width: number; height: number; ratio: number };
 
+/** Redraw interval while nothing animates, to repaint a canvas the browser discarded. */
+const KEEPALIVE_MS = 15_000;
+/** Wait before rebuilding the canvas after a lost context. */
+const RECOVERY_DELAY_MS = 800;
+/** Rebuilds allowed within RECOVERY_PERIOD_MS before the scene is given up on. */
+const MAX_CONTEXT_RECOVERIES = 3;
+const RECOVERY_PERIOD_MS = 60_000;
+
 function readViewport(): Viewport {
   return {
     width: window.innerWidth,
@@ -71,6 +79,11 @@ export default function KeyboardBackground() {
   const [quality, setQuality] = useState<SceneQuality>(start?.quality ?? 1);
   const [failed, setFailed] = useState(false);
   const [lost, setLost] = useState(false);
+  // Bumped to build a fresh canvas (and WebGL context) after a context loss.
+  const [generation, setGeneration] = useState(0);
+  // One monitor for the whole mount, so the tier it started at stays the ceiling.
+  const [monitor] = useState(() => new SceneQualityMonitor());
+  const losses = useRef<number[]>([]);
   const qualityRef = useRef<SceneQuality>(start?.quality ?? 1);
 
   useEffect(() => {
@@ -118,21 +131,81 @@ export default function KeyboardBackground() {
     };
   }, [controller, start]);
 
-  // Sustained slow frames demote quality; tier 3 unmounts the bridge and freezes.
+  // Sustained slow frames demote quality and a healthy stretch wins it back. Gaps
+  // in the frame stream (an idle, covered or backgrounded page) are discarded by
+  // the monitor and by the resets below, never counted as a slow GPU.
   useEffect(() => {
     if (!start || lost || failed) return;
-    const monitor = new SceneQualityMonitor();
-    let previous = performance.now();
-    return controller.subscribe(() => {
+    const clock = { previous: performance.now() };
+    const resume = () => {
+      clock.previous = performance.now();
+      monitor.reset();
+    };
+    document.addEventListener("visibilitychange", resume);
+    window.addEventListener("focus", resume);
+    window.addEventListener("blur", resume);
+    const unsubscribe = controller.subscribe(() => {
       const now = performance.now();
-      const interval = now - previous;
-      previous = now;
+      const interval = now - clock.previous;
+      clock.previous = now;
       const next = monitor.observe(interval, qualityRef.current);
       if (next === qualityRef.current) return;
       qualityRef.current = next;
       setQuality(next);
     });
-  }, [controller, failed, lost, start]);
+    return () => {
+      unsubscribe();
+      document.removeEventListener("visibilitychange", resume);
+      window.removeEventListener("focus", resume);
+      window.removeEventListener("blur", resume);
+    };
+  }, [controller, failed, lost, monitor, start]);
+
+  // A browser may discard the pixels of an idle canvas. While something animates
+  // every frame repaints them; when nothing does (paused, reduced motion) these
+  // redraws put the picture back on return and slowly in the meantime.
+  useEffect(() => {
+    if (!start) return;
+    const redraw = () => controller.requestFrame();
+    const onVisible = () => {
+      if (!document.hidden) redraw();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", redraw);
+    window.addEventListener("pageshow", redraw);
+    const timer = setInterval(() => {
+      if (!controller.isAmbient() && !document.hidden) redraw();
+    }, KEEPALIVE_MS);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", redraw);
+      window.removeEventListener("pageshow", redraw);
+    };
+  }, [controller, start]);
+
+  // A lost context (the GPU reclaimed it while the page idled, or a driver reset)
+  // is recovered by building a new canvas. A few recoveries are allowed per minute;
+  // beyond that the page settles without a background rather than flapping.
+  useEffect(() => {
+    if (!lost || failed) return;
+    const timer = setTimeout(() => {
+      const now = performance.now();
+      const recent = [
+        ...losses.current.filter((at) => now - at < RECOVERY_PERIOD_MS),
+        now,
+      ];
+      losses.current = recent;
+      if (recent.length > MAX_CONTEXT_RECOVERIES) {
+        failScene();
+        setFailed(true);
+        return;
+      }
+      setGeneration((current) => current + 1);
+      setLost(false);
+    }, RECOVERY_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [failed, lost]);
 
   const budget = viewport
     ? sceneBudget(viewport.width, viewport.height, viewport.ratio, quality)
@@ -166,6 +239,7 @@ export default function KeyboardBackground() {
       {active && budget && (
         <SceneBoundary onFail={handleFail}>
           <Canvas
+            key={generation}
             camera={{ fov: 38, position: [0, 0, 10], near: 0.1, far: 400 }}
             dpr={budget.ratio}
             frameloop="never"
