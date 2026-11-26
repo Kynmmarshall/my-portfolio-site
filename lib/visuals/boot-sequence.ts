@@ -18,14 +18,26 @@ export const BOOT_EXIT_MS = 900;
 /** Progress held while the scene is still preparing. */
 export const WAITING_CEILING = 88;
 
-export type BootStep = { at: number; label: string };
+export type BootStep = { at: number; label: string; fr: string };
 
 export const BOOT_STEPS: readonly BootStep[] = [
-  { at: 0, label: "mounting layout" },
-  { at: 20, label: "compiling 5 keyboard layers" },
-  { at: 42, label: `wiring ${KEY_COUNT} switches` },
-  { at: 64, label: "tuning the legends" },
-  { at: 86, label: "starting the render loop" },
+  { at: 0, label: "mounting layout", fr: "montage de la mise en page" },
+  {
+    at: 20,
+    label: "compiling 5 keyboard layers",
+    fr: "compilation de 5 couches de clavier",
+  },
+  {
+    at: 42,
+    label: `wiring ${KEY_COUNT} switches`,
+    fr: `câblage de ${KEY_COUNT} switches`,
+  },
+  { at: 64, label: "tuning the legends", fr: "réglage des légendes" },
+  {
+    at: 86,
+    label: "starting the render loop",
+    fr: "démarrage de la boucle de rendu",
+  },
 ];
 
 const clamp = (value: number, min: number, max: number) =>

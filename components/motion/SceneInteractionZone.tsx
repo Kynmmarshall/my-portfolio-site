@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Move3D, RotateCcw } from "lucide-react";
 import { useSceneMotion } from "@/context/ScrollMotionProvider";
+import { useText } from "@/hooks/useLocale";
 
 /**
  * Opt-in direct manipulation of the background keyboard.
@@ -12,6 +13,7 @@ import { useSceneMotion } from "@/context/ScrollMotionProvider";
  */
 export function SceneInteractionZone() {
   const controller = useSceneMotion();
+  const t = useText();
   const [shaped, setShaped] = useState(false);
   const dragging = useRef(false);
   const origin = useRef({ x: 0, y: 0, inputX: 0, inputY: 0 });
@@ -43,8 +45,14 @@ export function SceneInteractionZone() {
       <button
         type="button"
         className="icon-button scene-drag"
-        aria-label="Shape the background keyboard. Drag, or use arrow keys to rotate."
-        title="Shape the background keyboard"
+        aria-label={t({
+          en: "Shape the background keyboard. Drag, or use arrow keys to rotate.",
+          fr: "Façonner le clavier d'arrière-plan. Faites-le glisser ou utilisez les flèches pour le faire pivoter.",
+        })}
+        title={t({
+          en: "Shape the background keyboard",
+          fr: "Façonner le clavier d'arrière-plan",
+        })}
         onPointerDown={(event) => {
           const input = controller.readInput();
           dragging.current = true;
@@ -88,8 +96,14 @@ export function SceneInteractionZone() {
           type="button"
           className="icon-button"
           onClick={reset}
-          aria-label="Reset the background keyboard"
-          title="Reset the background keyboard"
+          aria-label={t({
+            en: "Reset the background keyboard",
+            fr: "Réinitialiser le clavier d'arrière-plan",
+          })}
+          title={t({
+            en: "Reset the background keyboard",
+            fr: "Réinitialiser le clavier d'arrière-plan",
+          })}
         >
           <RotateCcw size={18} />
         </button>

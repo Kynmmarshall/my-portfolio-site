@@ -209,6 +209,7 @@ test("reduced motion, navigation, contact and accessibility", async ({
   await expect(
     page.getByRole("link", { name: "Get in touch" }),
   ).toHaveAttribute("href", /A%20role/);
+  await expect(page.locator(".boot-loader")).toHaveCount(0);
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();
@@ -252,6 +253,7 @@ test("gameplay previews, dashboard accessibility and full-page composition", asy
     .toBe(true);
   for (const path of ["/insights", "/projects/pick-my-dish"]) {
     await page.goto(path);
+    await expect(page.locator(".boot-loader")).toHaveCount(0);
     const result = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();

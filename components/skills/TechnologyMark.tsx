@@ -46,10 +46,12 @@ import cmake from "devicon/icons/cmake/cmake-original.svg";
 import latex from "devicon/icons/latex/latex-original.svg";
 import opengl from "devicon/icons/opengl/opengl-original.svg";
 import type { pillars } from "@/content/profile";
+import { kindLabel, termLabel, type Kind } from "@/content/terms";
+import { L, T } from "@/components/i18n/T";
 import { profileListedTools } from "@/content/github-stack";
 
 type ToolName = (typeof pillars)[number]["tools"][number];
-type Mark = { kind: string } & (
+type Mark = { kind: Kind } & (
   | { logo: StaticImageData | string; icon?: never }
   | { icon: LucideIcon; logo?: never }
 );
@@ -117,7 +119,7 @@ export function TechnologyMark({ name }: { name: ToolName }) {
         {mark.logo ? (
           <Image
             src={mark.logo}
-            alt={`${name} logo`}
+            alt=""
             width={40}
             height={40}
             className="technology-logo"
@@ -126,10 +128,16 @@ export function TechnologyMark({ name }: { name: ToolName }) {
           <Icon size={28} aria-hidden="true" />
         ) : null}
       </span>
-      <span className="technology-name">{name}</span>
-      <span className="technology-kind">{mark.kind}</span>
+      <span className="technology-name">
+        <L text={termLabel(name)} />
+      </span>
+      <span className="technology-kind">
+        <L text={kindLabel(mark.kind)} />
+      </span>
       {profileListedTools.includes(name) && (
-        <span className="technology-source">Profile-listed</span>
+        <span className="technology-source">
+          <T en="Profile-listed" fr="Listé dans le profil" />
+        </span>
       )}
     </li>
   );

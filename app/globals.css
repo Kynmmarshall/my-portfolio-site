@@ -2534,6 +2534,54 @@ body {
   }
 }
 
+/* ===== Language: both languages are in the page, the active one is shown ===== */
+t-en,
+t-fr {
+  display: contents;
+}
+html[lang="fr"] t-en,
+html:not([lang="fr"]) t-fr {
+  display: none;
+}
+.lang-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid light-dark(#9aa994, #ffffff40);
+  border-radius: 8px;
+  background: var(--read-surface);
+}
+.lang-toggle button {
+  min-width: 34px;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--ink);
+  font: 600 12px var(--mono);
+}
+.lang-toggle button:hover {
+  background: light-dark(#dfe5d6, #303b35);
+}
+.lang-toggle button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+/* Narrow phones also carry the tilt control, so the header needs to give a little back. */
+@media (max-width: 360px) {
+  .header-inner {
+    gap: 6px;
+  }
+  .lang-toggle button {
+    min-width: 28px;
+    padding: 0 5px;
+  }
+}
+
 /* ===== Header: slides away while scrolling down, returns on the way up ===== */
 .site-header {
   transition:
@@ -2592,6 +2640,10 @@ body {
 @media (max-width: 640px) {
   .portrait-wrap {
     justify-self: center;
+  }
+  .about-facts {
+    flex-wrap: wrap;
+    gap: 18px 28px;
   }
   /*
    * The portrait is anchored to the bottom of the hero and the text panel is

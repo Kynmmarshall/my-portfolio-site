@@ -180,6 +180,7 @@ for (const route of [
       "background-color",
       "rgb(23, 26, 25)",
     );
+    await expect(page.locator(".boot-loader")).toHaveCount(0);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();

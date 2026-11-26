@@ -10,76 +10,105 @@ import {
   Server,
   ShieldCheck,
 } from "lucide-react";
+import { L, T } from "@/components/i18n/T";
+import { useText } from "@/hooks/useLocale";
+import type { Localized } from "@/lib/i18n";
 
-const flows = {
+type Step = { icon: typeof Monitor; title: Localized; description: Localized };
+const same = (text: string): Localized => ({ en: text, fr: text });
+
+const flows: Record<"application" | "delivery", Step[]> = {
   application: [
     {
       icon: Monitor,
-      title: "Flutter + Provider",
-      description:
-        "Cross-platform screens, state management, and recipe discovery.",
+      title: same("Flutter + Provider"),
+      description: {
+        en: "Cross-platform screens, state management, and recipe discovery.",
+        fr: "Écrans multiplateformes, gestion d'état et découverte de recettes.",
+      },
     },
     {
       icon: Server,
-      title: "Node.js + Express",
-      description:
-        "Documented REST service boundaries for recipes, profiles, and authentication.",
+      title: same("Node.js + Express"),
+      description: {
+        en: "Documented REST service boundaries for recipes, profiles, and authentication.",
+        fr: "Frontières de services REST documentées pour les recettes, les profils et l'authentification.",
+      },
     },
     {
       icon: Database,
-      title: "PostgreSQL",
-      description:
-        "Relational persistence for users, recipes, and saved favourites.",
+      title: same("PostgreSQL"),
+      description: {
+        en: "Relational persistence for users, recipes, and saved favourites.",
+        fr: "Persistance relationnelle pour les utilisateurs, les recettes et les favoris enregistrés.",
+      },
     },
   ],
   delivery: [
     {
       icon: GitBranch,
-      title: "Source repository",
-      description:
-        "The shared application source and versioned Jenkins pipeline.",
+      title: { en: "Source repository", fr: "Dépôt du code source" },
+      description: {
+        en: "The shared application source and versioned Jenkins pipeline.",
+        fr: "Le code source partagé de l'application et le pipeline Jenkins versionné.",
+      },
     },
     {
       icon: ShieldCheck,
-      title: "Analysis + tests",
-      description:
-        "Flutter analysis, automated tests, and coverage report generation.",
+      title: { en: "Analysis + tests", fr: "Analyse + tests" },
+      description: {
+        en: "Flutter analysis, automated tests, and coverage report generation.",
+        fr: "Analyse Flutter, tests automatisés et génération du rapport de couverture.",
+      },
     },
     {
       icon: Boxes,
-      title: "Build + package",
-      description:
-        "Android APK and App Bundle creation, with archived build artifacts.",
+      title: { en: "Build + package", fr: "Build + packaging" },
+      description: {
+        en: "Android APK and App Bundle creation, with archived build artifacts.",
+        fr: "Création de l'APK et de l'App Bundle Android, avec archivage des artefacts de build.",
+      },
     },
     {
       icon: Server,
-      title: "VPS delivery",
-      description:
-        "The documented pipeline copies the website and release artifacts into the hosted project directory.",
+      title: { en: "VPS delivery", fr: "Livraison sur VPS" },
+      description: {
+        en: "The documented pipeline copies the website and release artifacts into the hosted project directory.",
+        fr: "Le pipeline documenté copie le site web et les artefacts de publication dans le répertoire du projet hébergé.",
+      },
     },
   ],
 };
 export function ArchitectureExplorer() {
   const [mode, setMode] = useState<keyof typeof flows>("application");
+  const t = useText();
   return (
     <section className="architecture-explorer">
       <div className="architecture-heading">
         <div>
-          <p className="eyebrow">DOCUMENTED ARCHITECTURE</p>
-          <h2>How the parts connect.</h2>
+          <p className="eyebrow">
+            <T en="DOCUMENTED ARCHITECTURE" fr="ARCHITECTURE DOCUMENTÉE" />
+          </p>
+          <h2>
+            <T en="How the parts connect." fr="Comment les pièces s'assemblent." />
+          </h2>
         </div>
-        <div className="segmented" role="group" aria-label="Architecture view">
+        <div
+          className="segmented"
+          role="group"
+          aria-label={t({ en: "Architecture view", fr: "Vue de l'architecture" })}
+        >
           <button
             aria-pressed={mode === "application"}
             onClick={() => setMode("application")}
           >
-            Application
+            <T en="Application" fr="Application" />
           </button>
           <button
             aria-pressed={mode === "delivery"}
             onClick={() => setMode("delivery")}
           >
-            Delivery
+            <T en="Delivery" fr="Livraison" />
           </button>
         </div>
       </div>
@@ -87,13 +116,17 @@ export function ArchitectureExplorer() {
         {flows[mode].map((step, index) => {
           const Icon = step.icon;
           return (
-            <li key={step.title}>
+            <li key={step.title.en}>
               <span className="architecture-icon">
                 <Icon size={22} />
               </span>
               <div>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
+                <h3>
+                  <L text={step.title} />
+                </h3>
+                <p>
+                  <L text={step.description} />
+                </p>
               </div>
               {index < flows[mode].length - 1 && (
                 <ArrowDown className="flow-arrow" size={14} />
@@ -108,7 +141,8 @@ export function ArchitectureExplorer() {
         target="_blank"
         rel="noreferrer"
       >
-        Source documentation <ArrowUpRight size={14} />
+        <T en="Source documentation" fr="Documentation du code source" />{" "}
+        <ArrowUpRight size={14} />
       </a>
     </section>
   );

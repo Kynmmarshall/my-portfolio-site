@@ -12,6 +12,8 @@ import { ReactiveBackground } from "@/components/motion/ReactiveBackground";
 import { SceneChoreography } from "@/components/motion/SceneChoreography";
 import { SceneLoadingStatus } from "@/components/motion/SceneLoadingStatus";
 import { BootLoader } from "@/components/motion/BootLoader";
+import { LocaleEffects } from "@/components/i18n/LocaleEffects";
+import { LOCALE_BOOTSTRAP_SCRIPT } from "@/lib/i18n";
 import { ThemeProvider } from "@/context/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -40,17 +42,17 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="system" suppressHydrationWarning>
       <body>
-        {/* Runs before first paint so a repeat visit in this tab never flashes the boot splash. */}
+        {/* Runs before first paint: picks the language and spares a repeat visit the boot splash. */}
         <script
           dangerouslySetInnerHTML={{
-            __html:
-              "try{if(sessionStorage.getItem('boot-seen'))document.documentElement.dataset.boot='skip'}catch(e){}",
+            __html: `${LOCALE_BOOTSTRAP_SCRIPT}try{if(sessionStorage.getItem('boot-seen'))document.documentElement.dataset.boot='skip'}catch(e){}`,
           }}
         />
         <ThemeProvider>
           <VisualPreferencesProvider>
             <ScrollMotionProvider>
               <BootLoader />
+              <LocaleEffects />
               <a className="skip-link" href="#main">
                 Skip to content
               </a>

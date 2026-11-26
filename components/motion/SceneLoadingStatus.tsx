@@ -1,19 +1,32 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { useText } from "@/hooks/useLocale";
+import type { Localized } from "@/lib/i18n";
 import {
   getSceneLoadingSnapshot,
   getServerSceneLoadingSnapshot,
   subscribeSceneLoading,
 } from "@/lib/visuals/scene-loading";
 
-function describe(phase: string, loaded: number, total: number) {
-  if (phase === "failed") return "Background scene unavailable. Page is ready.";
-  if (phase === "ready") return "Background scene ready.";
-  if (phase !== "preparing") return "";
+function describe(phase: string, loaded: number, total: number): Localized | null {
+  if (phase === "failed")
+    return {
+      en: "Background scene unavailable. Page is ready.",
+      fr: "Scène d'arrière-plan indisponible. La page est prête.",
+    };
+  if (phase === "ready")
+    return { en: "Background scene ready.", fr: "Scène d'arrière-plan prête." };
+  if (phase !== "preparing") return null;
   return total > 0
-    ? `Preparing background scene. ${loaded} of ${total} assets loaded.`
-    : "Preparing background scene.";
+    ? {
+        en: `Preparing background scene. ${loaded} of ${total} assets loaded.`,
+        fr: `Préparation de la scène d'arrière-plan. ${loaded} ressources sur ${total} chargées.`,
+      }
+    : {
+        en: "Preparing background scene.",
+        fr: "Préparation de la scène d'arrière-plan.",
+      };
 }
 
 /**
@@ -30,6 +43,8 @@ export function SceneLoadingStatus() {
     getServerSceneLoadingSnapshot,
   );
   const determinate = total > 0;
+  const t = useText();
+  const message = describe(phase, loaded, total);
   return (
     <>
       <div className="scene-loader" data-phase={phase} aria-hidden="true">
@@ -44,7 +59,7 @@ export function SceneLoadingStatus() {
         />
       </div>
       <p className="sr-only" role="status">
-        {describe(phase, loaded, total)}
+        {message ? t(message) : ""}
       </p>
     </>
   );

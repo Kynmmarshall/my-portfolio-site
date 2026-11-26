@@ -43,7 +43,7 @@ test("CPU-throttled mobile scene keeps bounded buffers and stops drawing while h
 
     const host = page.locator(".scene-background");
     await expect(host).toHaveAttribute("data-ready", "true");
-    // The single background context is reserved; the hero keeps the real portrait.
+    // The hero portrait is a static image, so the page has exactly one WebGL canvas.
     await expect(page.locator("canvas")).toHaveCount(1);
     await expect(page.locator(".hero-scene canvas")).toHaveCount(0);
     await expect(page.locator(".portrait-fallback")).toBeVisible();

@@ -4,6 +4,24 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Smartphone } from "lucide-react";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 import { usePageVisibility } from "@/hooks/usePageVisibility";
+import { useText } from "@/hooks/useLocale";
+import type { Localized } from "@/lib/i18n";
+
+const MESSAGES = {
+  disabled: { en: "Device tilt disabled.", fr: "Inclinaison de l'appareil désactivée." },
+  denied: {
+    en: "Device tilt permission was not granted. Scroll interaction remains available.",
+    fr: "L'autorisation d'inclinaison de l'appareil n'a pas été accordée. L'interaction par défilement reste disponible.",
+  },
+  enabled: {
+    en: "Device tilt enabled. Sensor availability depends on your browser and device.",
+    fr: "Inclinaison de l'appareil activée. La disponibilité du capteur dépend de votre navigateur et de votre appareil.",
+  },
+  unavailable: {
+    en: "Device tilt is unavailable. Scroll interaction remains available.",
+    fr: "L'inclinaison de l'appareil n'est pas disponible. L'interaction par défilement reste disponible.",
+  },
+} as const satisfies Record<string, Localized>;
 
 const subscribe = (notify: () => void) => {
   const media = window.matchMedia("(pointer: coarse)");
@@ -19,7 +37,9 @@ export function DeviceTiltControl() {
   const available = useSyncExternalStore(subscribe, supported, () => false);
   const [enabled, setEnabled] = useState(false);
   const [requesting, setRequesting] = useState(false);
-  const [message, setMessage] = useState("");
+  // Kept as a key so the announcement follows a language change.
+  const [message, setMessage] = useState<keyof typeof MESSAGES | null>(null);
+  const t = useText();
   const { paused, reducedMotion } = useVisualPreferences();
   const visible = usePageVisibility();
   useEffect(() => {
@@ -68,7 +88,7 @@ export function DeviceTiltControl() {
   async function toggle() {
     if (enabled) {
       setEnabled(false);
-      setMessage("Device tilt disabled.");
+      setMessage("disabled");
       return;
     }
     setRequesting(true);
@@ -81,24 +101,21 @@ export function DeviceTiltControl() {
         orientation.requestPermission &&
         (await orientation.requestPermission()) !== "granted"
       ) {
-        setMessage(
-          "Device tilt permission was not granted. Scroll interaction remains available.",
-        );
+        setMessage("denied");
         return;
       }
       setEnabled(true);
-      setMessage(
-        "Device tilt enabled. Sensor availability depends on your browser and device.",
-      );
+      setMessage("enabled");
     } catch {
-      setMessage(
-        "Device tilt is unavailable. Scroll interaction remains available.",
-      );
+      setMessage("unavailable");
     } finally {
       setRequesting(false);
     }
   }
   if (!available) return null;
+  const label = enabled
+    ? t({ en: "Disable device tilt", fr: "Désactiver l'inclinaison de l'appareil" })
+    : t({ en: "Enable device tilt", fr: "Activer l'inclinaison de l'appareil" });
   return (
     <span className="tilt-control">
       <button
@@ -106,13 +123,13 @@ export function DeviceTiltControl() {
         onClick={toggle}
         disabled={paused || reducedMotion || requesting}
         aria-pressed={enabled}
-        aria-label={enabled ? "Disable device tilt" : "Enable device tilt"}
-        title={enabled ? "Disable device tilt" : "Enable device tilt"}
+        aria-label={label}
+        title={label}
       >
         <Smartphone size={16} />
       </button>
       <span role="status" className="sr-only">
-        {message}
+        {message ? t(MESSAGES[message]) : ""}
       </span>
     </span>
   );

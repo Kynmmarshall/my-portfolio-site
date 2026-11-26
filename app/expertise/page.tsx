@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SkillArchitecture } from "@/components/skills/SkillArchitecture";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { githubStackSource } from "@/content/github-stack";
+import { T } from "@/components/i18n/T";
 import { ArrowUpRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -15,14 +16,27 @@ export default function ExpertisePage() {
     <>
       <header className="shell page-heading" data-scene="expertise">
         <p className="eyebrow">
-          <span /> CAPABILITIES & CRAFT
+          <span /> <T en="CAPABILITIES & CRAFT" fr="COMPÉTENCES ET SAVOIR-FAIRE" />
         </p>
         <h1>
-          Engineering expertise<span className="accent-text">.</span>
+          <T
+            en={
+              <>
+                Engineering expertise<span className="accent-text">.</span>
+              </>
+            }
+            fr={
+              <>
+                Expertise en ingénierie<span className="accent-text">.</span>
+              </>
+            }
+          />
         </h1>
         <p>
-          From the interface to the infrastructure. My project toolkit,
-          alongside the technologies and practices listed on my GitHub profile.
+          <T
+            en="From the interface to the infrastructure. My project toolkit, alongside the technologies and practices listed on my GitHub profile."
+            fr="De l'interface à l'infrastructure. La boîte à outils de mes projets, ainsi que les technologies et pratiques listées sur mon profil GitHub."
+          />
         </p>
         <a
           className="text-link"
@@ -30,7 +44,8 @@ export default function ExpertisePage() {
           target="_blank"
           rel="noreferrer"
         >
-          GitHub tech profile <ArrowUpRight size={15} />
+          <T en="GitHub tech profile" fr="Profil technique GitHub" />{" "}
+          <ArrowUpRight size={15} />
         </a>
       </header>
       <SkillArchitecture />

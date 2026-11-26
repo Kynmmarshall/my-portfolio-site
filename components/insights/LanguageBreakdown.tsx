@@ -1,4 +1,5 @@
 import type { Language } from "@/lib/schemas/analytics";
+import { PercentText, T } from "@/components/i18n/T";
 const colors = [
   "#258675",
   "#c58d5b",
@@ -33,9 +34,15 @@ export function LanguageBreakdown({
           <div key={language.name}>
             <span className="language-label">
               <i style={{ background: colors[index % colors.length] }} />
-              {language.name}
+              {language.name === "Other" ? (
+                <T en="Other" fr="Autres" />
+              ) : (
+                language.name
+              )}
             </span>
-            <span className="mono">{language.share.toFixed(1)}%</span>
+            <span className="mono">
+              <PercentText value={language.share} />
+            </span>
           </div>
         ))}
       </div>

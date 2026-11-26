@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { T } from "@/components/i18n/T";
 import {
   BOOT_EXIT_MS,
   BOOT_TICK_MS,
@@ -62,6 +63,7 @@ export function BootLoader() {
 
   if (gone) return null;
   const steps = reachedSteps(progress);
+  const seconds = (clock.ticks * BOOT_TICK_MS) / 1000;
   return (
     <div
       className="boot-loader"
@@ -85,7 +87,7 @@ export function BootLoader() {
             return (
               <p key={step.label} className="boot-line" data-active={active}>
                 <span className="boot-mark">{active ? "›" : "✓"}</span>
-                {step.label}
+                <T en={step.label} fr={step.fr} />
                 {active && <i className="boot-caret" />}
               </p>
             );
@@ -93,7 +95,10 @@ export function BootLoader() {
           {done && (
             <p className="boot-line boot-ready">
               <span className="boot-mark">✓</span>
-              ready in {((clock.ticks * BOOT_TICK_MS) / 1000).toFixed(1)}s
+              <T
+                en={`ready in ${seconds.toFixed(1)}s`}
+                fr={`prêt en ${seconds.toFixed(1).replace(".", ",")} s`}
+              />
             </p>
           )}
         </div>
@@ -103,12 +108,15 @@ export function BootLoader() {
         <div className="boot-foot">
           <span>{String(progress).padStart(3, " ")}%</span>
           <kbd className="boot-key" data-down={done ? "true" : "false"}>
-            ↵ enter
+            <T en="↵ enter" fr="↵ entrée" />
           </kbd>
         </div>
       </div>
       <p className="boot-sign">
-        Kamdeu Yamdjeuson Neil Marshall / software engineer
+        <T
+          en="Kamdeu Yamdjeuson Neil Marshall / software engineer"
+          fr="Kamdeu Yamdjeuson Neil Marshall / ingénieur logiciel"
+        />
       </p>
     </div>
   );

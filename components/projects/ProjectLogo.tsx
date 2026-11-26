@@ -7,6 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 import { LazyMotion, domAnimation, m, useInView } from "framer-motion";
 import { useVisualPreferences } from "@/context/VisualPreferencesContext";
 import { usePageVisibility } from "@/hooks/usePageVisibility";
+import { useText } from "@/hooks/useLocale";
 
 export function ProjectLogo({
   title,
@@ -23,6 +24,7 @@ export function ProjectLogo({
   const inView = useInView(root);
   const { paused, reducedMotion } = useVisualPreferences();
   const pageVisible = usePageVisibility();
+  const t = useText();
   const moving = inView && pageVisible && !paused && !reducedMotion;
   return (
     <Link
@@ -30,7 +32,7 @@ export function ProjectLogo({
       ref={root}
       className={`project-logo media-${color}`}
       data-project={slug}
-      aria-label={`Explore ${title}`}
+      aria-label={t({ en: `Explore ${title}`, fr: `Découvrir ${title}` })}
     >
       <span className="logo-index" aria-hidden="true">
         {slug.replaceAll("-", " ")}
@@ -52,7 +54,7 @@ export function ProjectLogo({
         >
           <Image
             src={logo}
-            alt={`${title} logo`}
+            alt={t({ en: `${title} logo`, fr: `Logo ${title}` })}
             fill
             sizes="100px"
             className="project-logo-image"

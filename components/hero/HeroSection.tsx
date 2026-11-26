@@ -11,6 +11,7 @@ import {
 import { SceneControls } from "./SceneControls";
 import { SceneInteractionZone } from "@/components/motion/SceneInteractionZone";
 import { SocialLinks } from "@/components/layout/SocialLinks";
+import { T } from "@/components/i18n/T";
 
 export function HeroSection() {
   return (
@@ -29,33 +30,61 @@ export function HeroSection() {
         </div>
         <div className="hero-coordinate" aria-hidden="true">
           03.8480 N / 11.5021 E<br />
-          YAOUNDE, CAMEROON
+          <T en="YAOUNDE, CAMEROON" fr="YAOUNDÉ, CAMEROUN" />
         </div>
         <div className="shell hero-inner">
           <div className="hero-topline">
-            <span className="status-dot" /> INDEPENDENT MIND. CONNECTED SYSTEMS.
+            <span className="status-dot" />{" "}
+            <T
+              en="INDEPENDENT MIND. CONNECTED SYSTEMS."
+              fr="ESPRIT INDÉPENDANT. SYSTÈMES CONNECTÉS."
+            />
           </div>
           <h1 id="hero-title">
             Kamdeu
             <span className="name-secondary">
               Yamdjeuson<span className="accent-text">.</span>
             </span>
-            <small>Neil Marshall / Software engineer</small>
+            <small>
+              <T
+                en="Neil Marshall / Software engineer"
+                fr="Neil Marshall / Ingénieur logiciel"
+              />
+            </small>
           </h1>
           <p className="hero-copy">
-            From the first pixel to the final deployment.
-            <br />I build applications, interactive worlds, and the systems that
-            bring them to life.
+            <T
+              en={
+                <>
+                  From the first pixel to the final deployment.
+                  <br />I build applications, interactive worlds, and the
+                  systems that bring them to life.
+                </>
+              }
+              fr={
+                <>
+                  Du premier pixel au déploiement final.
+                  <br />
+                  Je conçois des applications, des univers interactifs et les
+                  systèmes qui leur donnent vie.
+                </>
+              }
+            />
           </p>
           <div className="hero-actions">
             <Link href="#work" className="button button-dark">
-              Explore my work <ArrowDownRight size={18} />
+              <T en="Explore my work" fr="Découvrir mes projets" />{" "}
+              <ArrowDownRight size={18} />
             </Link>
             <Link href="#contact" className="button button-light">
-              Let&apos;s build something <ArrowUpRight size={17} />
+              <T en="Let's build something" fr="Construisons quelque chose" />{" "}
+              <ArrowUpRight size={17} />
             </Link>
           </div>
-          <SocialLinks label="Connect with Marshall" />
+          <SocialLinks
+            id="hero-social"
+            label={{ en: "Connect with Marshall", fr: "Me retrouver en ligne" }}
+          />
         </div>
         <div className="shell hero-bottom">
           <div className="hero-tools">
@@ -66,19 +95,22 @@ export function HeroSection() {
       </section>
       <div className="shell discipline-band">
         <span>
-          <Code2 size={17} /> Full-stack development
+          <Code2 size={17} />{" "}
+          <T en="Full-stack development" fr="Développement full-stack" />
         </span>
         <span className="cross">+</span>
         <span>
-          <Server size={17} /> DevOps & infrastructure
+          <Server size={17} />{" "}
+          <T en="DevOps & infrastructure" fr="DevOps et infrastructure" />
         </span>
         <span className="cross">+</span>
         <span>
-          <Gamepad2 size={17} /> Game development
+          <Gamepad2 size={17} />{" "}
+          <T en="Game development" fr="Développement de jeux" />
         </span>
         <span className="cross">+</span>
         <span>
-          <GitBranch size={17} /> Open-source thinking
+          <GitBranch size={17} /> <T en="Open-source thinking" fr="Esprit open source" />
         </span>
       </div>
     </>

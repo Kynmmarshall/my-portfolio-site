@@ -1,10 +1,20 @@
+import type { Localized } from "../lib/i18n.ts";
+
+export type Category = "Applications" | "Games";
+
+/** The category value stays English: it is the `?category=` URL filter. */
+export const CATEGORY_LABEL: Record<Category, Localized> = {
+  Applications: { en: "Applications", fr: "Applications" },
+  Games: { en: "Games", fr: "Jeux" },
+};
+
 export type Project = {
   slug: string;
   title: string;
-  category: "Applications" | "Games";
+  category: Category;
   number: string;
-  description: string;
-  role: string;
+  description: Localized;
+  role: Localized;
   stack: string[];
   liveUrl: string;
   sourceUrl?: string;
@@ -21,10 +31,10 @@ export type Project = {
   video?: string;
   portrait?: boolean;
   featured: boolean;
-  problem: string;
-  approach: string;
-  highlights: string[];
-  evidence: { label: string; url: string }[];
+  problem: Localized;
+  approach: Localized;
+  highlights: Localized[];
+  evidence: { label: Localized; url: string }[];
 };
 
 export const projects: Project[] = [
@@ -33,8 +43,14 @@ export const projects: Project[] = [
     title: "BatchIt",
     number: "01",
     category: "Applications",
-    description: "A little community. A lot more buying power.",
-    role: "ScrumMaster / DevOps / localisation",
+    description: {
+      en: "A little community. A lot more buying power.",
+      fr: "Une petite communauté. Bien plus de pouvoir d'achat.",
+    },
+    role: {
+      en: "ScrumMaster / DevOps / localisation",
+      fr: "ScrumMaster / DevOps / localisation",
+    },
     stack: ["Flutter", "Dart", "CI/CD", "VPS"],
     liveUrl: "https://batchit.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/BatchIt",
@@ -51,20 +67,39 @@ export const projects: Project[] = [
       "/media/projects/batchit/cover.webp",
     ],
     featured: true,
-    problem:
-      "Buying alone can make everyday essentials more expensive. BatchIt brings nearby shoppers together to pool purchases and coordinate a shared order.",
-    approach:
-      "My contribution brings delivery and product execution together: ScrumMaster responsibilities, VPS setup, deployment automation, and localisation. The product is collaborative work, with dedicated contributors across backend, maps, chat, and core Flutter features.",
+    problem: {
+      en: "Buying alone can make everyday essentials more expensive. BatchIt brings nearby shoppers together to pool purchases and coordinate a shared order.",
+      fr: "Acheter seul peut rendre les produits du quotidien plus chers. BatchIt réunit des acheteurs du voisinage pour mutualiser leurs achats et coordonner une commande commune.",
+    },
+    approach: {
+      en: "My contribution brings delivery and product execution together: ScrumMaster responsibilities, VPS setup, deployment automation, and localisation. The product is collaborative work, with dedicated contributors across backend, maps, chat, and core Flutter features.",
+      fr: "Ma contribution réunit la livraison et l'exécution produit : responsabilités de ScrumMaster, mise en place du VPS, automatisation du déploiement et localisation. Le produit est un travail collaboratif, avec des contributeurs dédiés au backend, aux cartes, au chat et aux fonctionnalités Flutter principales.",
+    },
     highlights: [
-      "Neighbourhood batch discovery and shared order progress",
-      "Automated delivery pipeline and VPS hosting",
-      "French and English localisation",
-      "A collaborative product with clearly defined team roles",
+      {
+        en: "Neighbourhood batch discovery and shared order progress",
+        fr: "Découverte des achats groupés du quartier et suivi de la commande commune",
+      },
+      {
+        en: "Automated delivery pipeline and VPS hosting",
+        fr: "Pipeline de livraison automatisé et hébergement sur VPS",
+      },
+      {
+        en: "French and English localisation",
+        fr: "Localisation en français et en anglais",
+      },
+      {
+        en: "A collaborative product with clearly defined team roles",
+        fr: "Un produit collaboratif aux rôles d'équipe clairement définis",
+      },
     ],
     evidence: [
-      { label: "Product and team", url: "https://batchit.duckdns.org/#team" },
       {
-        label: "Source repository",
+        label: { en: "Product and team", fr: "Produit et équipe" },
+        url: "https://batchit.duckdns.org/#team",
+      },
+      {
+        label: { en: "Source repository", fr: "Dépôt du code source" },
         url: "https://github.com/Kynmmarshall/BatchIt",
       },
     ],
@@ -74,8 +109,11 @@ export const projects: Project[] = [
     title: "Fruit Collector",
     number: "02",
     category: "Games",
-    description: "Small pixels. Precise physics. One more level.",
-    role: "Game development",
+    description: {
+      en: "Small pixels. Precise physics. One more level.",
+      fr: "Petits pixels. Physique précise. Encore un niveau.",
+    },
+    role: { en: "Game development", fr: "Développement de jeu" },
     stack: ["Flutter", "Flame", "Dart", "Tiled"],
     liveUrl: "https://fruitcollector.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/MobileGame",
@@ -96,28 +134,47 @@ export const projects: Project[] = [
     ],
     video: "/media/projects/fruit-collector/preview.mp4",
     featured: true,
-    problem:
-      "A platformer lives or dies by how it feels. Fruit Collector explores movement, collision, progression, and readable level design within a mobile-friendly game.",
-    approach:
-      "Built with Flutter and the Flame engine, the game combines character animation and collision-driven gameplay with touch and keyboard controls. SharedPreferences persists progress. Game-art credits remain with their respective creators.",
+    problem: {
+      en: "A platformer lives or dies by how it feels. Fruit Collector explores movement, collision, progression, and readable level design within a mobile-friendly game.",
+      fr: "Un jeu de plateforme tient à sa sensation de jeu. Fruit Collector explore le mouvement, les collisions, la progression et la lisibilité des niveaux dans un jeu adapté au mobile.",
+    },
+    approach: {
+      en: "Built with Flutter and the Flame engine, the game combines character animation and collision-driven gameplay with touch and keyboard controls. SharedPreferences persists progress. Game-art credits remain with their respective creators.",
+      fr: "Conçu avec Flutter et le moteur Flame, le jeu associe animation des personnages et gameplay basé sur les collisions, avec des commandes tactiles et clavier. SharedPreferences conserve la progression. Les crédits des visuels restent attribués à leurs créateurs respectifs.",
+    },
     highlights: [
-      "Published on Google Play for Android",
-      "Five levels and four selectable characters",
-      "Touch and keyboard input",
-      "Collision, gravity, and movement systems",
-      "Locally saved progression",
+      {
+        en: "Published on Google Play for Android",
+        fr: "Publié sur Google Play pour Android",
+      },
+      {
+        en: "Five levels and four selectable characters",
+        fr: "Cinq niveaux et quatre personnages au choix",
+      },
+      { en: "Touch and keyboard input", fr: "Commandes tactiles et clavier" },
+      {
+        en: "Collision, gravity, and movement systems",
+        fr: "Systèmes de collision, de gravité et de mouvement",
+      },
+      {
+        en: "Locally saved progression",
+        fr: "Progression sauvegardée localement",
+      },
     ],
     evidence: [
       {
-        label: "Google Play release",
+        label: { en: "Google Play release", fr: "Version Google Play" },
         url: "https://play.google.com/store/apps/details?id=com.kynmmarshall.fruitcollector&hl=fr",
       },
       {
-        label: "Game and technical details",
+        label: {
+          en: "Game and technical details",
+          fr: "Détails du jeu et aspects techniques",
+        },
         url: "https://fruitcollector.duckdns.org",
       },
       {
-        label: "Source repository",
+        label: { en: "Source repository", fr: "Dépôt du code source" },
         url: "https://github.com/Kynmmarshall/MobileGame",
       },
     ],
@@ -127,8 +184,14 @@ export const projects: Project[] = [
     title: "Pick My Dish",
     number: "03",
     category: "Applications",
-    description: "From what's in your kitchen to what's for dinner.",
-    role: "Co-development / delivery automation",
+    description: {
+      en: "From what's in your kitchen to what's for dinner.",
+      fr: "De ce qu'il y a dans votre cuisine à ce qu'il y a pour dîner.",
+    },
+    role: {
+      en: "Co-development / delivery automation",
+      fr: "Co-développement / automatisation de la livraison",
+    },
     stack: ["Flutter", "Node.js", "PostgreSQL", "Jenkins"],
     liveUrl: "https://pickmydish.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/Pick-My-Dish",
@@ -142,23 +205,42 @@ export const projects: Project[] = [
       "/media/projects/pick-my-dish/detail.webp",
     ],
     featured: true,
-    problem:
-      "Choosing a recipe involves more than a search term. Available ingredients, time, and mood all shape what people actually want to cook.",
-    approach:
-      "Co-developed with Tuheu Tchoubi Pempem Moussa Fahdil. The documented architecture separates Flutter/Provider presentation from Node.js/Express services and PostgreSQL persistence. The repository includes a Jenkins pipeline for analysis, testing, packaging, and delivery.",
+    problem: {
+      en: "Choosing a recipe involves more than a search term. Available ingredients, time, and mood all shape what people actually want to cook.",
+      fr: "Choisir une recette ne se résume pas à un mot-clé. Les ingrédients disponibles, le temps et l'humeur influencent ce que les gens ont réellement envie de cuisiner.",
+    },
+    approach: {
+      en: "Co-developed with Tuheu Tchoubi Pempem Moussa Fahdil. The documented architecture separates Flutter/Provider presentation from Node.js/Express services and PostgreSQL persistence. The repository includes a Jenkins pipeline for analysis, testing, packaging, and delivery.",
+      fr: "Co-développé avec Tuheu Tchoubi Pempem Moussa Fahdil. L'architecture documentée sépare la présentation Flutter/Provider des services Node.js/Express et de la persistance PostgreSQL. Le dépôt inclut un pipeline Jenkins pour l'analyse, les tests, le packaging et la livraison.",
+    },
     highlights: [
-      "Mood, ingredient, and cooking-time discovery",
-      "Saved favourites and recipe details",
-      "Documented layered architecture and design patterns",
-      "Jenkins build and release pipeline",
+      {
+        en: "Mood, ingredient, and cooking-time discovery",
+        fr: "Découverte par humeur, ingrédients et temps de cuisson",
+      },
+      {
+        en: "Saved favourites and recipe details",
+        fr: "Favoris enregistrés et détails des recettes",
+      },
+      {
+        en: "Documented layered architecture and design patterns",
+        fr: "Architecture en couches et patrons de conception documentés",
+      },
+      {
+        en: "Jenkins build and release pipeline",
+        fr: "Pipeline Jenkins de build et de publication",
+      },
     ],
     evidence: [
       {
-        label: "Architecture and contributors",
+        label: {
+          en: "Architecture and contributors",
+          fr: "Architecture et contributeurs",
+        },
         url: "https://github.com/Kynmmarshall/Pick-My-Dish",
       },
       {
-        label: "Build pipeline",
+        label: { en: "Build pipeline", fr: "Pipeline de build" },
         url: "https://github.com/Kynmmarshall/Pick-My-Dish/blob/main/jenkinsfile",
       },
     ],
@@ -168,8 +250,11 @@ export const projects: Project[] = [
     title: "Trip-io",
     number: "04",
     category: "Applications",
-    description: "A better day out, built around Yaounde.",
-    role: "Application development",
+    description: {
+      en: "A better day out, built around Yaounde.",
+      fr: "Une meilleure sortie, pensée pour Yaoundé.",
+    },
+    role: { en: "Application development", fr: "Développement d'application" },
     stack: ["Cross-platform", "Itineraries", "Localisation"],
     liveUrl: "https://trip-io.duckdns.org",
     color: "blue",
@@ -184,19 +269,38 @@ export const projects: Project[] = [
       "/media/projects/trip-io/about.webp",
     ],
     featured: true,
-    problem:
-      "Discovering a city is one thing; fitting its destinations into a useful day plan is another. Trip-io focuses on real places in Cameroon's capital.",
-    approach:
-      "The application brings curated destinations and timed itineraries together, with English and French support. Its public distribution includes Android, Windows, and a browser app. The portfolio keeps its backend and repository mapping unspecified until verified.",
+    problem: {
+      en: "Discovering a city is one thing; fitting its destinations into a useful day plan is another. Trip-io focuses on real places in Cameroon's capital.",
+      fr: "Découvrir une ville est une chose ; intégrer ses lieux dans un programme de journée utile en est une autre. Trip-io se concentre sur de vrais lieux de la capitale du Cameroun.",
+    },
+    approach: {
+      en: "The application brings curated destinations and timed itineraries together, with English and French support. Its public distribution includes Android, Windows, and a browser app. The portfolio keeps its backend and repository mapping unspecified until verified.",
+      fr: "L'application réunit des destinations sélectionnées et des itinéraires chronométrés, avec une prise en charge de l'anglais et du français. Sa distribution publique comprend Android, Windows et une application web. Ce portfolio laisse son backend et la correspondance avec le dépôt non précisés tant qu'ils ne sont pas vérifiés.",
+    },
     highlights: [
-      "Curated destinations around Yaounde",
-      "Time-aware itinerary planning",
-      "English and French",
-      "Android, Windows, and web distribution",
+      {
+        en: "Curated destinations around Yaounde",
+        fr: "Destinations sélectionnées autour de Yaoundé",
+      },
+      {
+        en: "Time-aware itinerary planning",
+        fr: "Planification d'itinéraires selon l'heure",
+      },
+      { en: "English and French", fr: "Anglais et français" },
+      {
+        en: "Android, Windows, and web distribution",
+        fr: "Distribution Android, Windows et web",
+      },
     ],
     evidence: [
-      { label: "Project website", url: "https://trip-io.duckdns.org" },
-      { label: "Browser app", url: "https://trip-io.duckdns.org/app/" },
+      {
+        label: { en: "Project website", fr: "Site du projet" },
+        url: "https://trip-io.duckdns.org",
+      },
+      {
+        label: { en: "Browser app", fr: "Application web" },
+        url: "https://trip-io.duckdns.org/app/",
+      },
     ],
   },
   {
@@ -204,8 +308,11 @@ export const projects: Project[] = [
     title: "Grid Survival",
     number: "05",
     category: "Games",
-    description: "Think ahead. Keep moving. Survive the grid.",
-    role: "Game development",
+    description: {
+      en: "Think ahead. Keep moving. Survive the grid.",
+      fr: "Anticipez. Avancez. Survivez à la grille.",
+    },
+    role: { en: "Game development", fr: "Développement de jeu" },
     stack: ["Python", "Pygame", "Game logic"],
     liveUrl: "https://grid-survival.duckdns.org",
     sourceUrl: "https://github.com/Kynmmarshall/Grid_Survival",
@@ -215,19 +322,32 @@ export const projects: Project[] = [
     gallery: ["/media/projects/grid-survival/cover.webp"],
     video: "/media/projects/grid-survival/preview.mp4",
     featured: true,
-    problem:
-      "A constrained grid creates room for readable decisions and repeatable game rules. This Python project explores survival mechanics in a compact play space.",
-    approach:
-      "The project combines Python gameplay logic with a visual game loop. Its source repository and recorded gameplay provide a direct look at the implementation; the companion website is maintained separately.",
+    problem: {
+      en: "A constrained grid creates room for readable decisions and repeatable game rules. This Python project explores survival mechanics in a compact play space.",
+      fr: "Une grille contrainte laisse la place à des décisions lisibles et à des règles de jeu reproductibles. Ce projet Python explore des mécaniques de survie dans un espace de jeu compact.",
+    },
+    approach: {
+      en: "The project combines Python gameplay logic with a visual game loop. Its source repository and recorded gameplay provide a direct look at the implementation; the companion website is maintained separately.",
+      fr: "Le projet associe une logique de jeu Python à une boucle de jeu visuelle. Son dépôt de code source et une partie enregistrée offrent un aperçu direct de l'implémentation ; le site compagnon est maintenu séparément.",
+    },
     highlights: [
-      "Grid-based survival gameplay",
-      "Python game-loop implementation",
-      "Recorded gameplay preview",
-      "Separate game and distribution website repositories",
+      { en: "Grid-based survival gameplay", fr: "Gameplay de survie sur grille" },
+      {
+        en: "Python game-loop implementation",
+        fr: "Implémentation de la boucle de jeu en Python",
+      },
+      {
+        en: "Recorded gameplay preview",
+        fr: "Aperçu du gameplay enregistré",
+      },
+      {
+        en: "Separate game and distribution website repositories",
+        fr: "Dépôts distincts pour le jeu et le site de distribution",
+      },
     ],
     evidence: [
       {
-        label: "Game source",
+        label: { en: "Game source", fr: "Code source du jeu" },
         url: "https://github.com/Kynmmarshall/Grid_Survival",
       },
     ],
@@ -237,8 +357,11 @@ export const projects: Project[] = [
     title: "Math Runner",
     number: "06",
     category: "Games",
-    description: "A learning experience with a little momentum.",
-    role: "Game development",
+    description: {
+      en: "A learning experience with a little momentum.",
+      fr: "Un apprentissage avec un peu d'élan.",
+    },
+    role: { en: "Game development", fr: "Développement de jeu" },
     stack: ["Python", "Pygame", "Educational games"],
     liveUrl: "https://kynmarshall.itch.io/math-runner",
     sourceUrl: "https://github.com/Kynmmarshall/MATH-RUNNER",
@@ -248,18 +371,28 @@ export const projects: Project[] = [
     gallery: ["/media/projects/math-runner/cover.webp"],
     video: "/media/projects/math-runner/preview.mp4",
     featured: false,
-    problem:
-      "Math practice can feel disconnected from play. Math Runner brings questions into a fast-paced educational game.",
-    approach:
-      "A Python/Pygame project connecting runner mechanics with mathematical challenges. The itch.io release provides the downloadable game and its system requirements.",
+    problem: {
+      en: "Math practice can feel disconnected from play. Math Runner brings questions into a fast-paced educational game.",
+      fr: "Les exercices de maths peuvent sembler éloignés du jeu. Math Runner intègre les questions dans un jeu éducatif au rythme rapide.",
+    },
+    approach: {
+      en: "A Python/Pygame project connecting runner mechanics with mathematical challenges. The itch.io release provides the downloadable game and its system requirements.",
+      fr: "Un projet Python/Pygame qui relie les mécaniques d'un jeu de course à des défis mathématiques. La version itch.io propose le jeu à télécharger et sa configuration requise.",
+    },
     highlights: [
-      "Educational runner mechanics",
-      "Mathematical challenges",
-      "Python and Pygame implementation",
+      {
+        en: "Educational runner mechanics",
+        fr: "Mécaniques de jeu de course éducatives",
+      },
+      { en: "Mathematical challenges", fr: "Défis mathématiques" },
+      {
+        en: "Python and Pygame implementation",
+        fr: "Implémentation en Python et Pygame",
+      },
     ],
     evidence: [
       {
-        label: "itch.io release",
+        label: { en: "itch.io release", fr: "Version itch.io" },
         url: "https://kynmarshall.itch.io/math-runner",
       },
     ],
@@ -269,8 +402,11 @@ export const projects: Project[] = [
     title: "Plane Game",
     number: "07",
     category: "Games",
-    description: "An arcade experiment, close to the metal.",
-    role: "Game development",
+    description: {
+      en: "An arcade experiment, close to the metal.",
+      fr: "Une expérience d'arcade, au plus près de la machine.",
+    },
+    role: { en: "Game development", fr: "Développement de jeu" },
     stack: ["C++", "graphics.h", "Windows APIs"],
     liveUrl: "https://kynmarshall.itch.io/kynm-plane-game",
     sourceUrl: "https://github.com/Kynmmarshall/PlaneGame",
@@ -280,18 +416,28 @@ export const projects: Project[] = [
     gallery: ["/media/projects/plane-game/cover.webp"],
     video: "/media/projects/plane-game/preview.mp4",
     featured: false,
-    problem:
-      "Building an arcade game without a large engine is a practical way to study input, rendering, and real-time state.",
-    approach:
-      "A Windows arcade game built with C++, graphics.h, and Windows APIs. The project focuses on responsive controls, game progression, and two-player interaction.",
+    problem: {
+      en: "Building an arcade game without a large engine is a practical way to study input, rendering, and real-time state.",
+      fr: "Créer un jeu d'arcade sans gros moteur est un bon moyen d'étudier les entrées, le rendu et l'état en temps réel.",
+    },
+    approach: {
+      en: "A Windows arcade game built with C++, graphics.h, and Windows APIs. The project focuses on responsive controls, game progression, and two-player interaction.",
+      fr: "Un jeu d'arcade Windows construit avec C++, graphics.h et les API Windows. Le projet met l'accent sur des commandes réactives, la progression du jeu et l'interaction à deux joueurs.",
+    },
     highlights: [
-      "Single-player and two-player modes",
-      "Real-time input and rendering",
-      "Persistent high scores",
+      {
+        en: "Single-player and two-player modes",
+        fr: "Modes solo et deux joueurs",
+      },
+      {
+        en: "Real-time input and rendering",
+        fr: "Entrées et rendu en temps réel",
+      },
+      { en: "Persistent high scores", fr: "Meilleurs scores conservés" },
     ],
     evidence: [
       {
-        label: "itch.io release",
+        label: { en: "itch.io release", fr: "Version itch.io" },
         url: "https://kynmarshall.itch.io/kynm-plane-game",
       },
     ],

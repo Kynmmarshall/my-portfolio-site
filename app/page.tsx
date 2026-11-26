@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { InsightsPreview } from "@/components/insights/InsightsPreview";
 import { featuredProjects } from "@/content/projects";
 import { profile } from "@/content/profile";
+import { L, T } from "@/components/i18n/T";
 
 export default function HomePage() {
   return (
@@ -18,20 +19,26 @@ export default function HomePage() {
           <div className="section-heading">
             <div>
               <p className="eyebrow">
-                <span /> IDEAS, MADE REAL
+                <span /> <T en="IDEAS, MADE REAL" fr="DES IDÉES, CONCRÉTISÉES" />
               </p>
               <h2>
-                Selected work<small> / 05</small>
+                <T en="Selected work" fr="Projets sélectionnés" />
+                <small> / 05</small>
               </h2>
             </div>
             <Link href="/projects" className="text-link">
-              The full collection <ArrowUpRight size={16} />
+              <T en="The full collection" fr="Toute la collection" />{" "}
+              <ArrowUpRight size={16} />
             </Link>
           </div>
           <ProjectGrid projects={featuredProjects.slice(0, 4)} />
           <div className="work-bottom">
             <Link href="/projects" className="button button-light">
-              More projects, more possibilities <Plus size={16} />
+              <T
+                en="More projects, more possibilities"
+                fr="Plus de projets, plus de possibilités"
+              />{" "}
+              <Plus size={16} />
             </Link>
           </div>
         </Reveal>
@@ -54,32 +61,60 @@ export default function HomePage() {
         </div>
         <div>
           <p className="eyebrow">
-            <span /> THE PERSON BEHIND THE CODE
+            <span />{" "}
+            <T
+              en="THE PERSON BEHIND THE CODE"
+              fr="LA PERSONNE DERRIÈRE LE CODE"
+            />
           </p>
           <h2>
-            Curiosity is the
-            <br />
-            common thread.
+            <T
+              en={
+                <>
+                  Curiosity is the
+                  <br />
+                  common thread.
+                </>
+              }
+              fr={
+                <>
+                  La curiosité est
+                  <br />
+                  le fil conducteur.
+                </>
+              }
+            />
           </h2>
-          <p>{profile.bio}</p>
           <p>
-            I like understanding how things work, then making them work better.
-            Whether it&apos;s a game loop or a deployment pipeline, my approach
-            is the same: start with the problem, make deliberate choices, and
-            keep learning.
+            <L text={profile.bio} />
+          </p>
+          <p>
+            <T
+              en="I like understanding how things work, then making them work better. Whether it's a game loop or a deployment pipeline, my approach is the same: start with the problem, make deliberate choices, and keep learning."
+              fr="J'aime comprendre comment les choses fonctionnent, puis les faire mieux fonctionner. Qu'il s'agisse d'une boucle de jeu ou d'un pipeline de déploiement, mon approche est la même : partir du problème, faire des choix réfléchis et continuer à apprendre."
+            />
           </p>
           <Link href="/expertise" className="text-link">
-            Explore my expertise <ArrowUpRight size={16} />
+            <T en="Explore my expertise" fr="Découvrir mon expertise" />{" "}
+            <ArrowUpRight size={16} />
           </Link>
           <div className="about-facts">
             <div>
-              <span>BASED IN</span>Cameroon
+              <span>
+                <T en="BASED IN" fr="BASÉ AU" />
+              </span>
+              <T en="Cameroon" fr="Cameroun" />
             </div>
             <div>
-              <span>LANGUAGES</span>English & French
+              <span>
+                <T en="LANGUAGES" fr="LANGUES" />
+              </span>
+              <T en="English & French" fr="Anglais et français" />
             </div>
             <div>
-              <span>ON THE WEB</span>
+              <span>
+                <T en="ON THE WEB" fr="SUR LE WEB" />
+              </span>
               <a href={profile.github} target="_blank" rel="noreferrer">
                 @Kynmmarshall
               </a>

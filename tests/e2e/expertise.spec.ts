@@ -37,6 +37,7 @@ test("Expertise has its own route and remains accessible from desktop and mobile
       )
       .toBeGreaterThan(0);
   }
+  await expect(page.locator(".boot-loader")).toHaveCount(0);
   const accessibility = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();

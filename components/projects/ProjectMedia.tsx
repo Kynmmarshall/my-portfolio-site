@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, ImageOff } from "lucide-react";
+import { useText } from "@/hooks/useLocale";
 
 export function ProjectMedia({
   cover,
@@ -19,6 +20,7 @@ export function ProjectMedia({
   color?: string;
   priority?: boolean;
 }) {
+  const t = useText();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -73,7 +75,10 @@ export function ProjectMedia({
       ) : (
         <Image
           src={cover}
-          alt={`${title} application screenshot`}
+          alt={t({
+            en: `${title} application screenshot`,
+            fr: `Capture d'écran de l'application ${title}`,
+          })}
           fill
           sizes="(max-width: 700px) 100vw, 50vw"
           priority={priority}
@@ -93,16 +98,27 @@ export function ProjectMedia({
             className={playing ? "preview-video is-playing" : "preview-video"}
             onPause={() => setPlaying(false)}
             onError={() => setVideoFailed(true)}
-            aria-label={`${title} recorded gameplay`}
+            aria-label={t({
+              en: `${title} recorded gameplay`,
+              fr: `Gameplay enregistré de ${title}`,
+            })}
           />
           <button
             type="button"
             className="preview-control"
             onClick={toggle}
-            aria-label={`${playing ? "Pause" : "Play"} ${title} preview`}
+            aria-label={
+              playing
+                ? t({ en: `Pause ${title} preview`, fr: `Mettre en pause l'aperçu de ${title}` })
+                : t({ en: `Play ${title} preview`, fr: `Lire l'aperçu de ${title}` })
+            }
           >
             {playing ? <Pause size={15} /> : <Play size={15} />}
-            <span>{playing ? "Pause" : "Gameplay"}</span>
+            <span>
+              {playing
+                ? t({ en: "Pause", fr: "Pause" })
+                : t({ en: "Gameplay", fr: "Gameplay" })}
+            </span>
           </button>
         </>
       )}

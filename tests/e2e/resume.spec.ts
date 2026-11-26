@@ -65,6 +65,7 @@ test("resume presents a polished profile with logos and a working print layout",
     path: ".data/screenshots/resume-desktop.png",
     fullPage: true,
   });
+  await expect(page.locator(".boot-loader")).toHaveCount(0);
   const accessibility = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();

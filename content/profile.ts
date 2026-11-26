@@ -1,3 +1,5 @@
+import type { Localized } from "../lib/i18n.ts";
+
 export const profile = {
   name: "Kamdeu Yamdjeuson Neil Marshall",
   handle: "Kynmmarshall",
@@ -10,17 +12,25 @@ export const profile = {
   itch: "https://kynmarshall.itch.io",
   playStore:
     "https://play.google.com/store/apps/developer?id=Kamdeu+Yamdjeuson+Neil+Marshall",
-  bio: "I build thoughtful applications, playful worlds, and the systems that keep them running. A software engineer in Cameroon, working across full-stack development, game development, and DevOps.",
-};
+  bio: {
+    en: "I build thoughtful applications, playful worlds, and the systems that keep them running. A software engineer in Cameroon, working across full-stack development, game development, and DevOps.",
+    fr: "Je conçois des applications soignées, des univers ludiques et les systèmes qui les font tourner. Ingénieur logiciel au Cameroun, je travaille en développement full-stack, en développement de jeux et en DevOps.",
+  },
+} satisfies Record<string, string | Localized>;
 
 export const pillars = [
   {
     id: "infrastructure",
     number: "01",
-    title: "Build. Ship. Keep it running.",
-    label: "DevOps & infrastructure",
-    description:
-      "From a source change to a working release. Automated builds, testing, packaging, and VPS delivery, with attention to the work after launch.",
+    title: {
+      en: "Build. Ship. Keep it running.",
+      fr: "Construire. Livrer. Faire tourner.",
+    },
+    label: { en: "DevOps & infrastructure", fr: "DevOps et infrastructure" },
+    description: {
+      en: "From a source change to a working release. Automated builds, testing, packaging, and VPS delivery, with attention to the work after launch.",
+      fr: "Du changement de code à une version en production. Builds, tests, packaging et livraison sur VPS automatisés, sans négliger le travail après la mise en ligne.",
+    },
     tools: [
       "Jenkins",
       "GitHub Actions",
@@ -35,17 +45,28 @@ export const pillars = [
       "Backups",
       "Security hardening",
     ],
-    evidence: "BatchIt: deployment, VPS setup, and localisation",
+    evidence: {
+      en: "BatchIt: deployment, VPS setup, and localisation",
+      fr: "BatchIt : déploiement, mise en place du VPS et localisation",
+    },
     slug: "batchit",
     icon: "server",
   },
   {
     id: "games",
     number: "02",
-    title: "A little logic. A lot of play.",
-    label: "Game development & graphics",
-    description:
-      "Responsive movement, readable systems, and satisfying feedback. From Python prototypes to Flutter games and low-level C++ experiments.",
+    title: {
+      en: "A little logic. A lot of play.",
+      fr: "Un peu de logique. Beaucoup de jeu.",
+    },
+    label: {
+      en: "Game development & graphics",
+      fr: "Développement de jeux et graphisme",
+    },
+    description: {
+      en: "Responsive movement, readable systems, and satisfying feedback. From Python prototypes to Flutter games and low-level C++ experiments.",
+      fr: "Des déplacements réactifs, des systèmes lisibles et un retour de jeu satisfaisant. Des prototypes Python aux jeux Flutter, jusqu'aux expériences C++ bas niveau.",
+    },
     tools: [
       "Flame",
       "Pygame",
@@ -57,17 +78,22 @@ export const pillars = [
       "Custom C++ engine",
       "Game loops",
     ],
-    evidence: "Fruit Collector: gameplay, progression, and controls",
+    evidence: {
+      en: "Fruit Collector: gameplay, progression, and controls",
+      fr: "Fruit Collector : gameplay, progression et commandes",
+    },
     slug: "fruit-collector",
     icon: "game",
   },
   {
     id: "full-stack",
     number: "03",
-    title: "Useful from end to end.",
-    label: "Full-stack & automation",
-    description:
-      "Interfaces connected to practical services. Cross-platform Flutter applications, JavaScript backends, and data models that keep concerns separate.",
+    title: { en: "Useful from end to end.", fr: "Utile de bout en bout." },
+    label: { en: "Full-stack & automation", fr: "Full-stack et automatisation" },
+    description: {
+      en: "Interfaces connected to practical services. Cross-platform Flutter applications, JavaScript backends, and data models that keep concerns separate.",
+      fr: "Des interfaces reliées à des services concrets. Applications Flutter multiplateformes, backends JavaScript et modèles de données qui séparent clairement les responsabilités.",
+    },
     tools: [
       "Flutter",
       "Dart",
@@ -87,17 +113,25 @@ export const pillars = [
       "CSS3",
       "REST APIs",
     ],
-    evidence: "Pick My Dish: a documented full-stack architecture",
+    evidence: {
+      en: "Pick My Dish: a documented full-stack architecture",
+      fr: "Pick My Dish : une architecture full-stack documentée",
+    },
     slug: "pick-my-dish",
     icon: "code",
   },
   {
     id: "engineering",
     number: "04",
-    title: "Understand the foundations.",
-    label: "Core engineering",
-    description:
-      "Clean boundaries and deliberate tradeoffs. I work with Python, C, and C++, and continue exploring Java, graphics, and better developer tooling.",
+    title: {
+      en: "Understand the foundations.",
+      fr: "Maîtriser les fondations.",
+    },
+    label: { en: "Core engineering", fr: "Ingénierie de base" },
+    description: {
+      en: "Clean boundaries and deliberate tradeoffs. I work with Python, C, and C++, and continue exploring Java, graphics, and better developer tooling.",
+      fr: "Des frontières claires et des compromis assumés. Je travaille avec Python, C et C++, et je continue d'explorer Java, le graphisme et de meilleurs outils pour développeurs.",
+    },
     tools: [
       "Python",
       "C",
@@ -113,7 +147,10 @@ export const pillars = [
       "Integration testing",
       "Smoke testing",
     ],
-    evidence: "Plane Game: C++ and Windows rendering fundamentals",
+    evidence: {
+      en: "Plane Game: C++ and Windows rendering fundamentals",
+      fr: "Plane Game : bases du C++ et du rendu sous Windows",
+    },
     slug: "plane-game",
     icon: "layers",
   },
