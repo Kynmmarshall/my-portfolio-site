@@ -7,9 +7,15 @@ import type { ZodType } from "zod";
 let database: DatabaseSync | undefined;
 export function getDatabase() {
   if (database) return database;
+  // A runtime-only path. Without the ignore comment Turbopack traces it at build
+  // time and fails when .data is a symlink out of the release directory (update.sh).
   const path =
     process.env.PORTFOLIO_DB_PATH ||
-    join(process.cwd(), ".data", "portfolio.sqlite");
+    join(
+      /* turbopackIgnore: true */ process.cwd(),
+      ".data",
+      "portfolio.sqlite",
+    );
   mkdirSync(dirname(path), { recursive: true });
   database = new DatabaseSync(path);
   database.exec(`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;
