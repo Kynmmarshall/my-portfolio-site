@@ -106,6 +106,7 @@ export function ProjectMedia({
           <button
             type="button"
             className="preview-control"
+            data-playing={playing ? "true" : "false"}
             onClick={toggle}
             aria-label={
               playing
@@ -113,8 +114,10 @@ export function ProjectMedia({
                 : t({ en: `Play ${title} preview`, fr: `Lire l'aperçu de ${title}` })
             }
           >
-            {playing ? <Pause size={15} /> : <Play size={15} />}
-            <span>
+            <span className="preview-control-icon">
+              {playing ? <Pause /> : <Play />}
+            </span>
+            <span className="preview-control-label">
               {playing
                 ? t({ en: "Pause", fr: "Pause" })
                 : t({ en: "Gameplay", fr: "Gameplay" })}
